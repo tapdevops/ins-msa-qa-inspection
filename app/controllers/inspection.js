@@ -1,91 +1,426 @@
 const inspectionHModel = require( '../models/inspectionH.js' );
 const inspectionLogHModel = require( '../models/inspectionHLog.js' );
 const inspectionDModel = require( '../models/inspectionD.js' );
+const inspectionLogDModel = require( '../models/inspectionDLog.js' );
+const inspectionTrackingModel = require( '../models/inspectionTracking.js' );
 const dateFormat = require( 'dateformat' );
 var querystring = require('querystring');
 const yyyymmdd = require( 'yyyy-mm-dd' );
 var url = require( 'url' );
 
+const config = require( '../../config/config.js' ); 	
+const uuid = require( 'uuid' );
+const nJwt = require( 'njwt' );
+const dateAndTimes = require( 'date-and-time' );
+const jwtDecode = require( 'jwt-decode' );
+const randomTextLib = require( '../libraries/randomText' );
+
+// Create and Save new Data
+exports.createTracking = ( req, res ) => {
+	
+	
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
+
+
+		var auth = jwtDecode( req.token );
+		var blockinscode = req.body.BLOCK_INSPECTION_CODE;
+		var split = blockinscode.split("-");
+
+		if ( split.length == 7 ) {
+
+			var randomText = randomTextLib.generate( 10 );
+			var CODE = auth.EMPLOYEE_NIK + 
+				dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
+				'-' + 
+				split[3] + 
+				'-' +
+				split[4] + 
+				'-' + 
+				split[5] + 
+				'-T-' + 
+				randomText;
+
+			const set = new inspectionTrackingModel( {
+				TRACK_INSPECTION_CODE: CODE,
+				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+				DATE_TRACK: req.body.DATE_TRACK,
+				LAT_TRACK: req.body.LAT_TRACK || "",
+				LONG_TRACK: req.body.LONG_TRACK || "",
+				SYNC_TIME: req.body.SYNC_TIME || "",
+				INSERT_USER: auth.USER_AUTH_CODE,
+				INSERT_TIME: new Date().getTime(),
+				UPDATE_USER: auth.USER_AUTH_CODE,
+				UPDATE_TIME: new Date().getTime(),
+				DELETE_USER: "",
+				DELETE_TIME: "",
+			} );
+
+			set.save()
+			.then( data => {
+				if ( !data ) {
+					return res.status( 404 ).send( {
+						status: false,
+						message: 'Inspection Tracking gagal dibuat',
+						data: {}
+					} );
+				}
+
+				res.send( {
+					status: true,
+					message: 'Success',
+					data: {}
+				} );
+
+			} ).catch( err => {
+				res.status( 500 ).send( {
+					status: false,
+					message: 'Some error occurred while creating data',
+					data: {}
+				} );
+			} );
+			
+		}
+		else {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Block Inspection Code tidak valid',
+				data: {}
+			} );
+		}
+		
+	} );
+	
+};
+
 // Create and Save new Data
 exports.create = ( req, res ) => {
 	
+	
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
 
-	const inspectionH = new inspectionHModel( {
-		BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
-		WERKS: req.body.WERKS,
-		AFD_CODE: req.body.AFD_CODE,
-		BLOCK_CODE: req.body.BLOCK_CODE,
-		INSPECTION_DATE: yyyymmdd.withTime( new Date( req.body.INSPECTION_DATE ) ) || "",
-		INSPECTION_RESULT: req.body.INSPECTION_RESULT,
-		STATUS_SYNC: req.body.STATUS_SYNC,
-		SYNC_TIME: yyyymmdd.withTime( new Date( req.body.SYNC_TIME ) ) || "",
-		START_INSPECTION: yyyymmdd.withTime( new Date( req.body.START_INSPECTION ) ) || "",
-		END_INSPECTION: yyyymmdd.withTime( new Date( req.body.START_INSPECTION ) ) || "",
-		LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
-		LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
-		LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
-		LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
-		INSERT_USER: req.body.INSERT_USER,
-		INSERT_TIME: yyyymmdd.withTime( new Date( req.body.INSERT_TIME ) ) || "",
-		UPDATE_USER: req.body.UPDATE_USER,
-		UPDATE_TIME: yyyymmdd.withTime( new Date( req.body.UPDATE_TIME ) ) || "",
-		DELETE_USER: req.body.DELETE_USER,
-		DELETE_TIME: yyyymmdd.withTime( new Date( req.body.DELETE_TIME ) ) || "",
-	} );
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
 
-	inspectionH.save()
-	.then( data => {
+		var auth = jwtDecode( req.token );
+		var randomText = randomTextLib.generate( 5 );
+		var CODE = auth.EMPLOYEE_NIK + 
+			'-INS-' + 
+			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
+			'-' + 
+			req.body.WERKS + 
+			'-' +
+			req.body.AFD_CODE + 
+			'-' + 
+			req.body.BLOCK_CODE + 
+			'-' + 
+			randomText;
 
-		// Insert Block Inspection Log
-		const inspectionHLog = new inspectionLogHModel( {
-			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
-			PROSES: req.body.LOG.PROSES,
-			IMEI: req.body.LOG.IMEI,
-			SYNC_TIME: yyyymmdd.withTime( new Date( req.body.LOG.SYNC_TIME ) ) || "",
-			INSERT_USER: req.body.INSERT_USER,
-			INSERT_TIME: yyyymmdd.withTime( new Date( req.body.INSERT_TIME ) ) || "",
+		console.log( CODE );
+		console.log( randomTextLib.generate( 5 ) );
+		console.log( auth );
+		
+		const inspectionH = new inspectionHModel( {
+			BLOCK_INSPECTION_CODE: CODE,
+			WERKS: req.body.WERKS,
+			AFD_CODE: req.body.AFD_CODE,
+			BLOCK_CODE: req.body.BLOCK_CODE,
+			INSPECTION_DATE: req.body.INSPECTION_DATE || "",
+			INSPECTION_RESULT: req.body.INSPECTION_RESULT,
+			STATUS_SYNC: req.body.STATUS_SYNC,
+			SYNC_TIME: req.body.SYNC_TIME || "",
+			START_INSPECTION: req.body.START_INSPECTION || "",
+			END_INSPECTION: req.body.START_INSPECTION || "",
+			LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
+			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
+			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
+			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
+			INSERT_USER: auth.USER_AUTH_CODE,
+			INSERT_TIME: new Date().getTime(),
+			UPDATE_USER: auth.USER_AUTH_CODE,
+			UPDATE_TIME: new Date().getTime(),
+			DELETE_USER: "",
+			DELETE_TIME: "",
 		} );
 
-		inspectionHLog.save()
-		.then( data_log => {
-    
-			var inspection_d = {};
-			inspectionDModel.insertMany( req.body.INSPECTION_D, function( err2, res2 ) {
-				if ( err2 ) throw err2;
-				inspection_d = res2;
-			});
+		inspectionH.save()
+		.then( data => {
 
-			result = {
-				_id: data._id,
-				BLOCK_INSPECTION_CODE: data.BLOCK_INSPECTION_CODE,
-				WERKS: data.WERKS,
-				AFD_CODE: data.AFD_CODE,
-				BLOCK_CODE: data.BLOCK_CODE,
-				INSPECTION_DATE: data.INSPECTION_DATE,
-				INSPECTION_RESULT: data.INSPECTION_RESULT,
-				STATUS_SYNC: data.STATUS_SYNC,
-				SYNC_TIME: data.SYNC_TIME,
-				START_INSPECTION: data.START_INSPECTION,
-				END_INSPECTION: data.END_INSPECTION,
-				LAT_START_INSPECTION: data.LAT_START_INSPECTION,
-				LONG_START_INSPECTION: data.LONG_START_INSPECTION,
-				LAT_END_INSPECTION: data.LAT_END_INSPECTION,
-				LONG_END_INSPECTION: data.LONG_END_INSPECTION,
-				INSERT_USER: data.INSERT_USER,
-				INSERT_TIME: data.INSERT_TIME,
-				UPDATE_USER: data.UPDATE_USER,
-				UPDATE_TIME: data.UPDATE_TIME,
-				DELETE_USER: data.DELETE_USER,
-				DELETE_TIME: data.DELETE_TIME,
-				__v: data.__v,
-				LOG: data_log,
-				INSPECTION_D: inspection_d
+			// Insert Block Inspection H Log
+			const inspectionHLog = new inspectionLogHModel( {
+				BLOCK_INSPECTION_CODE: CODE,
+				PROSES: 'INSERT',
+				IMEI: auth.IMEI,
+				SYNC_TIME: new Date().getTime(),
+				INSERT_USER: auth.USER_AUTH_CODE,
+				INSERT_TIME: new Date().getTime(),
+			} );
+
+			inspectionHLog.save()
+			.then( data_log => {
+	    		
+	    		var i = 1;
+	    		req.body.INSPECTION_D.forEach( function( inspd ) {
+
+	    			var CODE_D = auth.EMPLOYEE_NIK + 
+						'-INS-' + 
+						dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
+						'-' + 
+						req.body.WERKS + 
+						'-' +
+						req.body.AFD_CODE + 
+						'-' + 
+						req.body.BLOCK_CODE + 
+						'-D-' + 
+						i;
+
+					console.log(CODE);
+	    			const inspectionD = new inspectionDModel( {
+						BLOCK_INSPECTION_CODE_D: CODE_D,
+						BLOCK_INSPECTION_CODE: CODE,
+						CONTENT_CODE: inspd.CONTENT_CODE,
+						AREAL: inspd.AREAL,
+						VALUE: inspd.VALUE,
+						STATUS_SYNC: inspd.STATUS_SYNC,
+						SYNC_TIME: inspd.SYNC_TIME,
+						INSERT_USER: auth.USER_AUTH_CODE,
+						INSERT_TIME: new Date().getTime(),
+						UPDATE_USER: auth.USER_AUTH_CODE,
+						UPDATE_TIME: new Date().getTime(),
+						DELETE_USER: "",
+						DELETE_TIME: ""
+					} );
+
+					inspectionD.save()
+					.then( data => {
+						if ( !data ) {
+							console.log( 'Error Inspeksi D Insert 2' );
+						}
+						const inspectionLogD = new inspectionLogDModel( {
+							BLOCK_INSPECTION_CODE_D: CODE_D,
+							PROSES: 'INSERT',
+							IMEI: auth.IMEI,
+							SYNC_TIME: req.body.LOG.SYNC_TIME || "",
+							INSERT_USER: auth.USER_AUTH_CODE,
+							INSERT_TIME: new Date().getTime(),
+						} );
+
+						inspectionLogD.save();
+
+					} ).catch( err => {
+						console.log( 'Error Inspeksi D Insert' );
+					} );
+
+	    			i++;
+
+				} );
+
+				res.send( {
+					status: true,
+					message: 'Success',
+					//data: result
+					data: {}
+				} );
+			} ).catch( err => {
+				res.status( 500 ).send( {
+					status: false,
+					message: 'Some error occurred while creating data2',
+					data: {}
+				} );
+			} );
+
+		} ).catch( err => {
+			res.status( 500 ).send( {
+				status: false,
+				message: 'Some error occurred while creating data1',
+				data: {}
+			} );
+		} );
+		
+	} );
+	
+};
+
+// Create and Save new Data
+exports.createH = ( req, res ) => {
+	
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
+
+		var auth = jwtDecode( req.token );
+		var randomText = randomTextLib.generate( 5 );
+		var CODE = auth.EMPLOYEE_NIK + 
+			'-INS-' + 
+			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
+			'-' + 
+			req.body.WERKS + 
+			'-' +
+			req.body.AFD_CODE + 
+			'-' + 
+			req.body.BLOCK_CODE + 
+			'-' + 
+			randomText;
+		
+		const inspectionH = new inspectionHModel( {
+			BLOCK_INSPECTION_CODE: CODE,
+			WERKS: req.body.WERKS,
+			AFD_CODE: req.body.AFD_CODE,
+			BLOCK_CODE: req.body.BLOCK_CODE,
+			INSPECTION_DATE: req.body.INSPECTION_DATE || "",
+			INSPECTION_RESULT: req.body.INSPECTION_RESULT,
+			STATUS_SYNC: req.body.STATUS_SYNC,
+			SYNC_TIME: req.body.SYNC_TIME || "",
+			START_INSPECTION: req.body.START_INSPECTION || "",
+			END_INSPECTION: req.body.START_INSPECTION || "",
+			LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
+			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
+			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
+			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
+			INSERT_USER: auth.USER_AUTH_CODE,
+			INSERT_TIME: new Date().getTime(),
+			UPDATE_USER: auth.USER_AUTH_CODE,
+			UPDATE_TIME: new Date().getTime(),
+			DELETE_USER: "",
+			DELETE_TIME: "",
+		} );
+
+		inspectionH.save()
+		.then( data => {
+
+			// Insert Block Inspection H Log
+			const inspectionHLog = new inspectionLogHModel( {
+				BLOCK_INSPECTION_CODE: CODE,
+				PROSES: 'INSERT',
+				IMEI: auth.IMEI,
+				SYNC_TIME: new Date().getTime(),
+				INSERT_USER: auth.USER_AUTH_CODE,
+				INSERT_TIME: new Date().getTime(),
+			} );
+
+			inspectionHLog.save()
+			.then( data_log => {
+				if ( !data_log ) {
+					return res.status( 404 ).send( {
+						status: false,
+						message: 'Data gagal dibuat',
+						data: {}
+					} );
+				}
+
+				res.send( {
+					status: true,
+					message: 'Success',
+					//data: result
+					data: {}
+				} );
+			} ).catch( err => {
+				res.status( 500 ).send( {
+					status: false,
+					message: 'Some error occurred while creating data2',
+					data: {}
+				} );
+			} );
+
+		} ).catch( err => {
+			res.status( 500 ).send( {
+				status: false,
+				message: 'Some error occurred while creating data1',
+				data: {}
+			} );
+		} );
+		
+	} );
+	
+};
+
+// Create and Save new Data
+exports.createD = ( req, res ) => {
+	
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
+
+		var blockinscode = req.body.BLOCK_INSPECTION_CODE;
+		var split = blockinscode.split("-");
+		var auth = jwtDecode( req.token );
+		var randomText = randomTextLib.generate( 5 );
+		var CODE = auth.EMPLOYEE_NIK + 
+			'-' + 
+			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
+			'-' + 
+			split[3] + 
+			'-' +
+			split[4] + 
+			'-' + 
+			split[5] + 
+			'-D-' + 
+			randomText;
+
+		const set = new inspectionDModel( {
+			BLOCK_INSPECTION_CODE_D: CODE,
+			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+			CONTENT_CODE: req.body.CONTENT_CODE,
+			AREAL: req.body.AREAL,
+			VALUE: req.body.VALUE,
+			STATUS_SYNC: req.body.STATUS_SYNC,
+			SYNC_TIME: req.body.SYNC_TIME,
+			INSERT_USER: auth.USER_AUTH_CODE,
+			INSERT_TIME: new Date().getTime(),
+			UPDATE_USER: auth.USER_AUTH_CODE,
+			UPDATE_TIME: new Date().getTime(),
+			DELETE_USER: "",
+			DELETE_TIME: ""
+		} );
+
+		set.save()
+		.then( data => {
+			if ( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: 'Data gagal dibuat',
+					data: {}
+				} );
 			}
+
+			const setLog = new inspectionLogDModel( {
+				BLOCK_INSPECTION_CODE_D: CODE,
+				PROSES: 'INSERT',
+				IMEI: auth.IMEI,
+				SYNC_TIME: req.body.SYNC_TIME || "",
+				INSERT_USER: auth.USER_AUTH_CODE,
+				INSERT_TIME: new Date().getTime(),
+			} );
+
+			setLog.save();
 
 			res.send( {
 				status: true,
 				message: 'Success',
-				//data: result
 				data: {}
 			} );
 		} ).catch( err => {
@@ -95,77 +430,40 @@ exports.create = ( req, res ) => {
 				data: {}
 			} );
 		} );
-
-	} ).catch( err => {
-		res.status( 500 ).send( {
-			status: false,
-			message: 'Some error occurred while creating data1',
-			data: {}
-		} );
+		
 	} );
-
+	
 };
 
 // Retrieve and return all notes from the database.
-exports.find = ( req, res ) => {
-	//url_query = req.query;
-	
-	//var url_query_length = Object.keys( url_query ).length;
-	inspectionHModel.aggregate(
-		[
-			{
-				$lookup: {
-					from: "T_LOG_BLOCK_INSPECTION_H",
-					localField: "BLOCK_INSPECTION_CODE",
-					foreignField: "BLOCK_INSPECTION_CODE",
-					as: "LOGS"
-				}
-			}
-		]
-	)
-	.then( data => {
-		res.send( {
-			status: true,
-			message: 'Success',
-			data: data
-		} );
-	}).catch( err => {
-		res.status( 500 ).send( {
-			status: false,
-			message: err.message || "Some error occurred while retrieving data.",
-			data: {}
-		});
-	});
-};
+exports.findH = ( req, res ) => {
 
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
 
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
 
+		var auth = jwtDecode( req.token );
 
-/*
+		url_query = req.query;
+		var url_query_length = Object.keys( url_query ).length;
+		
+		url_query.DELETE_USER = "";
+		url_query.DELETE_TIME = "";
 
-// Retrieve and return all notes from the database.
-exports.find = ( req, res ) => {
-
-	// Output Query URL
-	 console.log(req.query);
-	// Count JSON length
-	// console.log( Object.keys( req.query ).length );
-
-	url_query = req.query;
-	
-	var url_query_length = Object.keys( url_query ).length;
-	
-	if ( url_query_length > 0 ) {
-		console.log( req.query );
-
-		afdelingModel.find( url_query )
+		inspectionHModel.find( url_query )
 		.then( data => {
-			if(!data) {
-				return res.status( 404 ).send({
+			if( !data ) {
+				return res.status( 404 ).send( {
 					status: false,
 					message: 'Data not found 2',
 					data: {}
-				});
+				} );
 			}
 			res.send( {
 				status: true,
@@ -186,144 +484,479 @@ exports.find = ( req, res ) => {
 				data: {}
 			} );
 		} );
-	}
-	else {
-		afdelingModel.find()
+	} );
+
+};
+
+// Retrieve and return all notes from the database.
+exports.findD = ( req, res ) => {
+
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
+				data: {}
+			} );
+		}
+
+		var auth = jwtDecode( req.token );
+
+		url_query = req.query;
+		var url_query_length = Object.keys( url_query ).length;
+		
+		url_query.DELETE_USER = "";
+		url_query.DELETE_TIME = "";
+
+		inspectionDModel.find( url_query )
 		.then( data => {
+			if( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: 'Data not found 2',
+					data: {}
+				} );
+			}
 			res.send( {
 				status: true,
 				message: 'Success',
 				data: data
 			} );
-		}).catch( err => {
-			res.status( 500 ).send( {
+		} ).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: 'Data not found 1',
+					data: {}
+				} );
+			}
+			return res.status( 500 ).send( {
 				status: false,
-				message: err.message || "Some error occurred while retrieving data.",
+				message: 'Error retrieving data',
 				data: {}
-			});
-		});
-	}
+			} );
+		} );
+	} );
 
 };
 
 // Find a single data with a ID
-exports.findOne = ( req, res ) => {
-	afdelingModel.findOne( { 
-		WERKS_AFD_CODE: req.params.GET_WERKS_AFD_CODE 
-	} ).then( data => {
-		if( !data ) {
-			return res.status(404).send({
+exports.findOneH = ( req, res ) => {
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
 				status: false,
-				message: "Data not found 2 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: 'Invalid Token',
 				data: {}
-			});
+			} );
 		}
-		res.send( {
-			status: true,
-			message: 'Success',
-			data: data
+
+		var auth = jwtDecode( req.token );
+
+		inspectionHModel.findOne( { 
+			BLOCK_INSPECTION_CODE : req.params.id,
+			DELETE_USER: "",
+			DELETE_TIME: ""
+		} ).then( data => {
+			if( !data ) {
+				return res.status(404).send({
+					status: false,
+					message: "Data not found 2 with id " + req.params.id,
+					data: data,
+				});
+			}
+			res.send( {
+				status: true,
+				message: 'Success',
+				data: data
+			} );
+		} ).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send({
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				});
+			}
+			return res.status( 500 ).send({
+				status: false,
+				message: "Error retrieving Data with id " + req.params.id,
+				data: {}
+			} );
 		} );
-	} ).catch( err => {
-		if( err.kind === 'ObjectId' ) {
-			return res.status( 404 ).send({
+	} );
+};
+
+// Find a single data with a ID
+exports.findOneD = ( req, res ) => {
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
 				status: false,
-				message: "Data not found 1 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: 'Invalid Token',
 				data: {}
-			});
+			} );
 		}
-		return res.status( 500 ).send({
-			status: false,
-			message: "Error retrieving Data with id " + req.params.GET_WERKS_AFD_CODE,
-			data: {}
+		
+		var auth = jwtDecode( req.token );
+
+		inspectionDModel.findOne( { 
+			BLOCK_INSPECTION_CODE_D : req.params.id,
+			DELETE_USER: "",
+			DELETE_TIME: ""
+		} ).then( data => {
+			if( !data ) {
+				return res.status(404).send({
+					status: false,
+					message: "Data not found 2 with id " + req.params.id,
+					data: data,
+				});
+			}
+			res.send( {
+				status: true,
+				message: 'Success',
+				data: data
+			} );
+		} ).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send({
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				});
+			}
+			return res.status( 500 ).send({
+				status: false,
+				message: "Error retrieving Data with id " + req.params.id,
+				data: {}
+			} );
 		} );
 	} );
 };
 
 // Update single data with ID
-exports.update = ( req, res ) => {
+exports.updateH = ( req, res ) => {
 
-	// Validation
-	if( !req.body.COMP_CODE ) {
-		return res.status( 400 ).send( {
-			status: false,
-			message: 'Invalid Input',
-			data: {}
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+		// Validation
+		if( !req.body.INSPECTION_DATE || !req.body.INSPECTION_RESULT || !req.body.STATUS_SYNC ) {
+			return res.status( 400 ).send({
+				status: false,
+				message: 'Invalid input',
+				data: {}
+			});
+		}
+
+		var auth = jwtDecode( req.token );
+		console.log( auth );
+		
+		inspectionHModel.findOneAndUpdate( { 
+			BLOCK_INSPECTION_CODE : req.params.id 
+		}, {
+			INSPECTION_DATE: req.body.INSPECTION_DATE || "",
+			INSPECTION_RESULT: req.body.INSPECTION_RESULT,
+			STATUS_SYNC: req.body.STATUS_SYNC,
+			SYNC_TIME: req.body.SYNC_TIME || "",
+			START_INSPECTION: req.body.START_INSPECTION || "",
+			END_INSPECTION: req.body.START_INSPECTION || "",
+			LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
+			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
+			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
+			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
+			UPDATE_USER: auth.USER_AUTH_CODE,
+			UPDATE_TIME: new Date().getTime()
+			
+		}, { new: true } )
+		.then( data => {
+			if( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+
+			// Insert Block Inspection H Log
+			const inspectionHLog = new inspectionLogHModel( {
+				BLOCK_INSPECTION_CODE: req.params.id,
+				PROSES: 'UPDATE',
+				IMEI: auth.IMEI,
+				SYNC_TIME: new Date().getTime(),
+				INSERT_USER: auth.USER_AUTH_CODE,
+				INSERT_TIME: new Date().getTime(),
+			} );
+
+			inspectionHLog.save()
+			.then( data_log => {
+				if( !data ) {
+					return res.status( 404 ).send( {
+						status: false,
+						message: "Data log not found 1 with id " + req.params.id,
+						data: {}
+					} );
+				}
+
+				res.send( {
+					status: true,
+					message: 'Success',
+					data: {}
+				} );
+			}).catch( err => {
+				if( err.kind === 'ObjectId' ) {
+					return res.status( 404 ).send( {
+						status: false,
+						message: "Data log not found 2 with id " + req.params.id,
+						data: {}
+					} );
+				}
+				return res.status( 500 ).send( {
+					status: false,
+					message: "Data log error updating with id " + req.params.id,
+					data: {}
+				} );
+			});
+
+		}).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 2 with id " + req.params.id,
+					data: {}
+				} );
+			}
+			return res.status( 500 ).send( {
+				status: false,
+				message: "Data error updating with id " + req.params.id,
+				data: {}
+			} );
 		});
-	}
+	});
+};
+
+// Update single data with ID
+exports.updateD = ( req, res ) => {
 	
-	afdelingModel.findOneAndUpdate( { 
-		WERKS_AFD_BLOCK_CODE : req.params.GET_WERKS_AFD_CODE 
-	}, {
-		REGION_CODE: req.body.REGION_CODE || "",
-		COMP_CODE: req.body.COMP_CODE || "",
-		EST_CODE: req.body.EST_CODE || "",
-		WERKS: req.body.WERKS || "",
-		AFD_CODE: req.body.AFD_CODE || "",
-		AFD_NAME: req.body.AFD_NAME || "",
-		WERKS_AFD_CODE: req.body.WERKS_AFD_CODE || "",
-		START_VALID: yyyymmdd( new Date( req.body.START_VALID ) ) || "",
-		END_VALID: yyyymmdd( new Date( req.body.END_VALID ) ) || "",
-		UPDATE_USER: req.body.UPDATE_USER || "",
-		UPDATE_TIME: yyyymmdd.withTime( new Date() ) || ""
-	}, { new: true } )
-	.then( data => {
-		if( !data ) {
-			return res.status( 404 ).send( {
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+		// Validation
+		if( !req.body.BLOCK_INSPECTION_CODE || !req.body.CONTENT_CODE || !req.body.STATUS_SYNC || !req.body.VALUE ) {
+			return res.status( 400 ).send({
 				status: false,
-				message: "Data not found 1 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: 'Invalid input',
+				data: {}
+			});
+		}
+
+		var auth = jwtDecode( req.token );
+		console.log( auth );
+		
+		inspectionDModel.findOneAndUpdate( { 
+			BLOCK_INSPECTION_CODE_D : req.params.id,
+			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
+		}, {
+			CONTENT_CODE: req.body.CONTENT_CODE,
+			AREAL: req.body.AREAL,
+			VALUE: req.body.VALUE,
+			STATUS_SYNC: req.body.STATUS_SYNC,
+			SYNC_TIME: req.body.SYNC_TIME,
+			UPDATE_USER: auth.USER_AUTH_CODE,
+			UPDATE_TIME: new Date().getTime()
+		}, { new: true } )
+		.then( data => {
+			if( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+			
+			res.send( {
+				status: true,
+				message: 'Success',
 				data: {}
 			} );
-		}
-		res.send( {
-			status: true,
-			message: 'Success',
-			data: data
-		} );
-	}).catch( err => {
-		if( err.kind === 'ObjectId' ) {
-			return res.status( 404 ).send( {
+		}).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 2 with id " + req.params.id,
+					data: {}
+				} );
+			}
+			return res.status( 500 ).send( {
 				status: false,
-				message: "Data not found 2 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: "Data error updating with id " + req.params.id,
 				data: {}
 			} );
-		}
-		return res.status( 500 ).send( {
-			status: false,
-			message: "Data error updating with id " + req.params.GET_WERKS_AFD_CODE,
-			data: {}
-		} );
+		});
 	});
 };
 
 // Delete data with the specified ID in the request
-exports.delete = ( req, res ) => {
-	afdelingModel.findOneAndRemove( { WERKS_AFD_CODE : req.params.GET_WERKS_AFD_CODE } )
-	.then( data => {
-		if( !data ) {
+exports.deleteH = ( req, res ) => {
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
 			return res.status( 404 ).send( {
 				status: false,
-				message: "Data not found 2 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: 'Invalid Token',
 				data: {}
 			} );
 		}
-		res.send( {
-			status: true,
-			message: 'Success',
-			data: {}
-		} );
-	}).catch( err => {
-		if( err.kind === 'ObjectId' || err.name === 'NotFound' ) {
-			return res.status(404).send({
+
+		var auth = jwtDecode( req.token );
+		res.json({
+			message:auth
+		})
+		/*
+		findingModel.findOneAndUpdate( { 
+			FINDING_CODE : req.params.id 
+		}, {
+			DELETE_USER: auth.USERNAME,
+			DELETE_TIME: new Date().getTime()
+			
+		}, { new: true } )
+		.then( data => {
+			if( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+
+			const setLog = new findingLogModel( {
+				FINDING_CODE: req.params.id,
+				PROSES: 'DELETE',
+				PROGRESS: '',
+				IMEI: auth.IMEI,
+				SYNC_TIME: new Date(),
+				SYNC_USER: auth.USER_AUTH_CODE
+			} );
+
+			setLog.save()
+			.then( data => {
+				if ( !data ) {
+					res.send( {
+					status: false,
+					message: 'Error',
+					data: {}
+				} );
+				}
+				res.send( {
+					status: true,
+					message: 'Success',
+					data: {}
+				} );
+
+			} ).catch( err => {
+				res.status( 500 ).send( {
+					status: false,
+					message: 'Some error occurred while deleting data',
+					data: {}
+				} );
+			} );
+			
+		}).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+			return res.status( 500 ).send( {
 				status: false,
-				message: "Data not found 1 with id " + req.params.GET_WERKS_AFD_CODE,
+				message: "Could not delete data with id " + req.params.id,
+				data: {}
+			} );
+		});
+		*/
+	});
+};
+
+// Delete data with the specified ID in the request
+exports.deleteD = ( req, res ) => {
+	nJwt.verify( req.token, config.secret_key, config.token_algorithm, ( err, authData ) => {
+
+		if ( err ) {
+			return res.status( 404 ).send( {
+				status: false,
+				message: 'Invalid Token',
 				data: {}
 			} );
 		}
-		return res.status( 500 ).send( {
-			status: false,
-			message: "Could not delete data with id " + req.params.GET_WERKS_AFD_CODE,
-			data: {}
-		} );
-	} );
+
+		var auth = jwtDecode( req.token );
+		res.json({
+			message:auth
+		})
+		/*
+		findingModel.findOneAndUpdate( { 
+			FINDING_CODE : req.params.id 
+		}, {
+			DELETE_USER: auth.USERNAME,
+			DELETE_TIME: new Date().getTime()
+			
+		}, { new: true } )
+		.then( data => {
+			if( !data ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+
+			const setLog = new findingLogModel( {
+				FINDING_CODE: req.params.id,
+				PROSES: 'DELETE',
+				PROGRESS: '',
+				IMEI: auth.IMEI,
+				SYNC_TIME: new Date(),
+				SYNC_USER: auth.USER_AUTH_CODE
+			} );
+
+			setLog.save()
+			.then( data => {
+				if ( !data ) {
+					res.send( {
+					status: false,
+					message: 'Error',
+					data: {}
+				} );
+				}
+				res.send( {
+					status: true,
+					message: 'Success',
+					data: {}
+				} );
+
+			} ).catch( err => {
+				res.status( 500 ).send( {
+					status: false,
+					message: 'Some error occurred while deleting data',
+					data: {}
+				} );
+			} );
+			
+		}).catch( err => {
+			if( err.kind === 'ObjectId' ) {
+				return res.status( 404 ).send( {
+					status: false,
+					message: "Data not found 1 with id " + req.params.id,
+					data: {}
+				} );
+			}
+			return res.status( 500 ).send( {
+				status: false,
+				message: "Could not delete data with id " + req.params.id,
+				data: {}
+			} );
+		});
+		*/
+	});
 };
-*/

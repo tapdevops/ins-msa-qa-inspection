@@ -37,6 +37,7 @@ exports.createTracking = ( req, res ) => {
 		if ( split.length == 7 ) {
 
 			var randomText = randomTextLib.generate( 10 );
+			/*
 			var CODE = auth.EMPLOYEE_NIK + 
 				dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
 				'-' + 
@@ -46,11 +47,11 @@ exports.createTracking = ( req, res ) => {
 				'-' + 
 				split[5] + 
 				'-T-' + 
-				randomText;
+				randomText;*/
 
 			const set = new inspectionTrackingModel( {
-				TRACK_INSPECTION_CODE: CODE,
-				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+				TRACK_INSPECTION_CODE: req.body.TRACK_INSPECTION_CODE || "",
+				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE || "",
 				DATE_TRACK: req.body.DATE_TRACK,
 				LAT_TRACK: req.body.LAT_TRACK || "",
 				LONG_TRACK: req.body.LONG_TRACK || "",
@@ -116,6 +117,7 @@ exports.create = ( req, res ) => {
 
 		var auth = jwtDecode( req.token );
 		var randomText = randomTextLib.generate( 5 );
+		/*
 		var CODE = auth.EMPLOYEE_NIK + 
 			'-INS-' + 
 			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
@@ -126,14 +128,14 @@ exports.create = ( req, res ) => {
 			'-' + 
 			req.body.BLOCK_CODE + 
 			'-' + 
-			randomText;
+			randomText;*/
 
 		console.log( CODE );
 		console.log( randomTextLib.generate( 5 ) );
 		console.log( auth );
 		
 		const inspectionH = new inspectionHModel( {
-			BLOCK_INSPECTION_CODE: CODE,
+			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
 			BLOCK_CODE: req.body.BLOCK_CODE,
@@ -160,7 +162,7 @@ exports.create = ( req, res ) => {
 
 			// Insert Block Inspection H Log
 			const inspectionHLog = new inspectionLogHModel( {
-				BLOCK_INSPECTION_CODE: CODE,
+				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 				PROSES: 'INSERT',
 				IMEI: auth.IMEI,
 				SYNC_TIME: new Date().getTime(),
@@ -188,8 +190,8 @@ exports.create = ( req, res ) => {
 
 					console.log(CODE);
 	    			const inspectionD = new inspectionDModel( {
-						BLOCK_INSPECTION_CODE_D: CODE_D,
-						BLOCK_INSPECTION_CODE: CODE,
+						BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
+						BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 						CONTENT_CODE: inspd.CONTENT_CODE,
 						AREAL: inspd.AREAL,
 						VALUE: inspd.VALUE,
@@ -209,7 +211,7 @@ exports.create = ( req, res ) => {
 							console.log( 'Error Inspeksi D Insert 2' );
 						}
 						const inspectionLogD = new inspectionLogDModel( {
-							BLOCK_INSPECTION_CODE_D: CODE_D,
+							BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
 							PROSES: 'INSERT',
 							IMEI: auth.IMEI,
 							SYNC_TIME: req.body.LOG.SYNC_TIME || "",
@@ -268,6 +270,7 @@ exports.createH = ( req, res ) => {
 
 		var auth = jwtDecode( req.token );
 		var randomText = randomTextLib.generate( 5 );
+		/*
 		var CODE = auth.EMPLOYEE_NIK + 
 			'-INS-' + 
 			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
@@ -278,10 +281,10 @@ exports.createH = ( req, res ) => {
 			'-' + 
 			req.body.BLOCK_CODE + 
 			'-' + 
-			randomText;
+			randomText;*/
 		
 		const inspectionH = new inspectionHModel( {
-			BLOCK_INSPECTION_CODE: CODE,
+			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
 			BLOCK_CODE: req.body.BLOCK_CODE,
@@ -308,7 +311,7 @@ exports.createH = ( req, res ) => {
 
 			// Insert Block Inspection H Log
 			const inspectionHLog = new inspectionLogHModel( {
-				BLOCK_INSPECTION_CODE: CODE,
+				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 				PROSES: 'INSERT',
 				IMEI: auth.IMEI,
 				SYNC_TIME: new Date().getTime(),
@@ -369,7 +372,7 @@ exports.createD = ( req, res ) => {
 		var split = blockinscode.split("-");
 		var auth = jwtDecode( req.token );
 		var randomText = randomTextLib.generate( 5 );
-		var CODE = auth.EMPLOYEE_NIK + 
+		/*var CODE = auth.EMPLOYEE_NIK + 
 			'-' + 
 			dateAndTimes.format( new Date(), 'YYYYMMDD' ) + 
 			'-' + 
@@ -379,10 +382,10 @@ exports.createD = ( req, res ) => {
 			'-' + 
 			split[5] + 
 			'-D-' + 
-			randomText;
+			randomText;*/
 
 		const set = new inspectionDModel( {
-			BLOCK_INSPECTION_CODE_D: CODE,
+			BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 			CONTENT_CODE: req.body.CONTENT_CODE,
 			AREAL: req.body.AREAL,
@@ -408,7 +411,7 @@ exports.createD = ( req, res ) => {
 			}
 
 			const setLog = new inspectionLogDModel( {
-				BLOCK_INSPECTION_CODE_D: CODE,
+				BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
 				PROSES: 'INSERT',
 				IMEI: auth.IMEI,
 				SYNC_TIME: req.body.SYNC_TIME || "",

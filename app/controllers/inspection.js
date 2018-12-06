@@ -130,7 +130,7 @@ exports.create = ( req, res ) => {
 			'-' + 
 			randomText;*/
 
-		console.log( CODE );
+		//console.log( CODE );
 		console.log( randomTextLib.generate( 5 ) );
 		console.log( auth );
 		

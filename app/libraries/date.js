@@ -1,4 +1,4 @@
-const moment = require( 'moment-timezonez' );
+const moment = require( 'moment-timezone' );
 module.exports.convert = function ( value, format ) {
 	
 	var result = '';

@@ -50,6 +50,6 @@
 		//url: 'mongodb://udb_inspeksi:tapinspeksiprod@dbapp.tap-agri.com:27017/s_inspeksi?authSource=admin',
 		ssl: true
 
-		url: 'mongodb://' + connection.username + ':' + connection.password + '@' + connection.host + ':' + connection.port + '/' + connection.database + '?authSource=' + connection.auth_source,
-		ssl: connection.ssl,
+		//url: 'mongodb://' + connection.username + ':' + connection.password + '@' + connection.host + ':' + connection.port + '/' + connection.database + '?authSource=' + connection.auth_source,
+		//ssl: connection.ssl,
 	}

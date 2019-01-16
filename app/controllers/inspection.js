@@ -52,10 +52,12 @@
 			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
 			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
 			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
-			INSERT_USER: auth.USER_AUTH_CODE,
-			INSERT_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
-			UPDATE_USER: auth.USER_AUTH_CODE,
-			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' )
+			INSERT_USER: req.body.INSERT_USER,
+			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+			UPDATE_USER: req.body.INSERT_USER,
+			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
+			DELETE_USER: "",
+			DELETE_TIME: 0
 		} );
 
 		set_data.save()
@@ -73,8 +75,8 @@
 				PROSES: 'INSERT',
 				IMEI: auth.IMEI,
 				SYNC_TIME: new Date().getTime(),
-				INSERT_USER: auth.USER_AUTH_CODE,
-				INSERT_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
+				INSERT_USER: req.body.INSERT_USER,
+				INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
 			} );
 
 			set_log.save()
@@ -170,10 +172,12 @@ exports.findOneH = ( req, res ) => {
 			VALUE: req.body.VALUE,
 			STATUS_SYNC: req.body.STATUS_SYNC,
 			SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
-			INSERT_USER: auth.USER_AUTH_CODE,
-			INSERT_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
-			UPDATE_USER: auth.USER_AUTH_CODE,
-			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' )
+			INSERT_USER: req.body.INSERT_USER,
+			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+			UPDATE_USER: req.body.INSERT_USER,
+			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
+			DELETE_USER: "",
+			DELETE_TIME: 0
 		} );
 
 
@@ -192,8 +196,8 @@ exports.findOneH = ( req, res ) => {
 				PROSES: 'INSERT',
 				IMEI: auth.IMEI,
 				SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
-				INSERT_USER: auth.USER_AUTH_CODE,
-				INSERT_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' )
+				INSERT_USER: req.body.INSERT_USER,
+				INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
 			} );
 
 			set_log.save()

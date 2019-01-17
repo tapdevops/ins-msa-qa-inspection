@@ -5,7 +5,18 @@ const InspectionHSchema = mongoose.Schema( {
 	WERKS: String,
 	AFD_CODE: String,
 	BLOCK_CODE: String,
+	AREAL: String,
+	INSPECTION_TYPE: String,
 	INSPECTION_DATE: {
+		type: Number,
+		get: v => Math.floor( v ),
+		set: v => Math.floor( v ),
+		alias: 'i',
+		default: function() {
+			return 0;
+		}
+	},
+	INSPECTION_SCORE: {
 		type: Number,
 		get: v => Math.floor( v ),
 		set: v => Math.floor( v ),
@@ -47,6 +58,7 @@ const InspectionHSchema = mongoose.Schema( {
 	LONG_START_INSPECTION: String,
 	LAT_END_INSPECTION: String,
 	LONG_END_INSPECTION: String,
+	ASSIGN_TO: String,
 	INSERT_USER: String,
 	INSERT_TIME: {
 		type: Number,

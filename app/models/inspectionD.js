@@ -3,8 +3,7 @@ const mongoose = require( 'mongoose' );
 const InspectionDSchema = mongoose.Schema( {
 	BLOCK_INSPECTION_CODE_D: String,
 	BLOCK_INSPECTION_CODE: String,
-	CONTENT_CODE: String,
-	AREAL: String,
+	CONTENT_INSPECTION_CODE: String,
 	VALUE: String,
 	STATUS_SYNC: String,
 	SYNC_TIME: {

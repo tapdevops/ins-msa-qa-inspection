@@ -69,6 +69,7 @@
 					data: {}
 				} );
 			}
+
 			// Insert Block Inspection H Log
 			const set_log = new inspectionLogHModel( {
 				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
@@ -85,13 +86,14 @@
 					return res.send( {
 						status: false,
 						message: config.error_message.create_404 + ' - Log',
-						data: {}
+						data: {},
+						BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
 					} );
 				}
 				res.send( {
 					status: true,
 					message: config.error_message.create_200,
-					data: {}
+					data: {},
 				} );
 			} ).catch( err => {
 				res.send( {

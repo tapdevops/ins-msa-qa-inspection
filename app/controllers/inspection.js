@@ -86,14 +86,14 @@
 					return res.send( {
 						status: false,
 						message: config.error_message.create_404 + ' - Log',
-						data: {},
-						BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
+						data: {}
 					} );
 				}
 				res.send( {
 					status: true,
 					message: config.error_message.create_200,
 					data: {},
+					BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
 				} );
 			} ).catch( err => {
 				res.send( {

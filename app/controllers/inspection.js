@@ -250,11 +250,13 @@ exports.findOneH = ( req, res ) => {
 			DATE_TRACK: date.convert( req.body.DATE_TRACK, 'YYYYMMDDhhmmss' ),
 			LAT_TRACK: req.body.LAT_TRACK || "",
 			LONG_TRACK: req.body.LONG_TRACK || "",
-			SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
-			INSERT_USER: auth.USER_AUTH_CODE,
-			INSERT_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
-			UPDATE_USER: auth.USER_AUTH_CODE,
-			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' )
+			SYNC_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
+			INSERT_USER: req.body.INSERT_USER || "",
+			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ) || 0,
+			UPDATE_USER: "",
+			UPDATE_TIME: 0,
+			DELETE_USER: "",
+			DELETE_TIME: 0
 		} );
 
 		set.save()

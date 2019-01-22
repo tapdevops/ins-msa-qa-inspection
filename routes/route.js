@@ -61,7 +61,8 @@ module.exports = ( app ) => {
 
 	// Routing: Inspection
 	app.post( '/inspection-header', token_verify, inspection.createH );
-	//app.get( '/inspection-header', verifyToken, inspection.findH );
+	app.get( '/inspection-header/all', token_verify, inspection.findHAll );
+	app.get( '/inspection-header/q', token_verify, inspection.findHAll );
 	app.get( '/inspection-header/:id', verifyToken, inspection.findOneH );
 	//app.put( '/inspection-header/:id', verifyToken, inspection.updateH );
 	//app.delete( '/inspection-header/:id', verifyToken, inspection.deleteH );

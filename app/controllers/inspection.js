@@ -456,7 +456,8 @@ exports.findOneH = ( req, res ) => {
 				} );
 			}
 			res.json({
-				message: "OK",
+				status: false,
+				message: config.error_message.find_200,
 				data: data
 			})
 		} ).catch( err => {

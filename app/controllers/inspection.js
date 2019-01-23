@@ -455,11 +455,11 @@ exports.findOneH = ( req, res ) => {
 					data: {}
 				} );
 			}
-			res.json({
-				status: false,
+			res.send( {
+				status: true,
 				message: config.error_message.find_200,
 				data: data
-			})
+			} );
 		} ).catch( err => {
 			res.send( {
 				status: false,

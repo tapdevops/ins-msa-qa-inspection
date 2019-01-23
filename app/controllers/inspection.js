@@ -79,7 +79,7 @@
 					}
 				]
 				*/
-			console.log(query);
+		console.log(query);
 
 
 		inspectionHModel.find(
@@ -405,8 +405,56 @@ exports.findOneH = ( req, res ) => {
  * --------------------------------------------------------------------------
  */
  	exports.findReport = ( req, res ) => {
- 		viewInspectionModel.find({})
+ 		var url_query = req.query;
+		var url_query_length = Object.keys( url_query ).length;
+		var query = {};
+			query.DELETE_USER = "";
+
+		if ( req.query.REGION_CODE ) {
+			query.WERKS = new RegExp( '^' + req.query.REGION_CODE.substr( 1, 1 ) );
+			//query.WERKS = new RegExp( '^' + req.query.WERKS );
+		}
+
+		if ( req.query.COMP_CODE ) {
+			query.WERKS = new RegExp( '^' + req.query.COMP_CODE );
+		}
+
+		if ( req.query.WERKS ) {
+			/*
+			var length_werks = String( req.query.WERKS ).length;
+
+			if ( length_werks < 4 ) {
+				query.WERKS = new RegExp( '^' + req.query.WERKS );
+			}
+			else if ( length_werks == 4 ) {
+				query.WERKS = req.query.WERKS;
+			}
+			else if ( length_werks > 4 ) {
+				query.WERKS = req.query.WERKS.substr( 0, 4 );
+			}
+			*/
+			query.WERKS = req.query.WERKS;
+		}
+
+		if ( req.query.AFD_CODE ) {
+			query.AFD_CODE = req.query.AFD_CODE;
+		}
+
+		if ( req.query.BLOCK_CODE ) {
+			query.BLOCK_CODE = req.query.BLOCK_CODE;
+		}
+
+		console.log( query );
+
+ 		viewInspectionModel.find( query)
 		.then( data => {
+			if( !data ) {
+				return res.send( {
+					status: false,
+					message: config.error_message.find_404,
+					data: {}
+				} );
+			}
 			res.json({
 				message: "OK",
 				data: data

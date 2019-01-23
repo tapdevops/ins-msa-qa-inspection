@@ -73,4 +73,9 @@ module.exports = ( app ) => {
 	//app.delete( '/inspection-detail/:id', verifyToken, inspection.deleteD );
 
 	app.post( '/inspection-tracking', token_verify, inspection.createTracking );
+
+
+	app.get( '/inspection-report/q', token_verify, inspection.findReport );
+	app.get( '/inspection-report/all', token_verify, inspection.findReport );
+
 }

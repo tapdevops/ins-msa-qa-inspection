@@ -58,7 +58,6 @@ const InspectionHSchema = mongoose.Schema( {
 	LONG_START_INSPECTION: String,
 	LAT_END_INSPECTION: String,
 	LONG_END_INSPECTION: String,
-	ASSIGN_TO: String,
 	INSERT_USER: String,
 	INSERT_TIME: {
 		type: Number,

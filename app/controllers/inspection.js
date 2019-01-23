@@ -7,6 +7,7 @@
  |
  */
  	// Models
+	const viewInspectionModel = require( '../models/viewInspection.js' );
 	const inspectionHModel = require( '../models/inspectionH.js' );
 	const inspectionLogHModel = require( '../models/inspectionHLog.js' );
 	const inspectionDModel = require( '../models/inspectionD.js' );
@@ -118,7 +119,7 @@
 					LONG_START_INSPECTION: result.LONG_START_INSPECTION,
 					LAT_END_INSPECTION: result.LAT_END_INSPECTION,
 					LONG_END_INSPECTION: result.LONG_END_INSPECTION,
-					ASSIGN_TO: result.ASSIGN_TO,
+					//ASSIGN_TO: result.ASSIGN_TO,
 					INSERT_USER: result.INSERT_USER,
 					INSERT_TIME: date.convert( String( result.INSERT_TIME ), 'YYYY-MM-DD hh-mm-ss' ),
 					UPDATE_USER: result.UPDATE_USER,
@@ -169,7 +170,7 @@
 			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
 			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
 			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
-			ASSIGN_TO: req.body.ASSIGN_TO,
+			//ASSIGN_TO: req.body.ASSIGN_TO,
 			INSERT_USER: req.body.INSERT_USER,
 			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
 			UPDATE_USER: req.body.INSERT_USER,
@@ -396,4 +397,150 @@ exports.findOneH = ( req, res ) => {
 			} );
 		} );
 		
+	};
+
+/**
+ * findAll
+ * Untuk menampilkan seluruh data tanpa batasan REFFERENCE_ROLE dan LOCATION_CODE
+ * --------------------------------------------------------------------------
+ */
+ 	exports.findReport = ( req, res ) => {
+ 		viewInspectionModel.find({})
+		.then( data => {
+			res.json({
+				message: "OK",
+				data: data
+			})
+		} ).catch( err => {
+			res.send( {
+				status: false,
+				message: config.error_message.find_500,
+				data: {}
+			} );
+		} );
+ 	}
+
+	exports.findReport2 = ( req, res ) => {
+
+		var url_query = req.query;
+		var url_query_length = Object.keys( url_query ).length;
+		var query = {};
+			query.DELETE_USER = "";
+
+		if ( req.query.REGION_CODE ) {
+			query.WERKS = new RegExp( '^' + req.query.REGION_CODE.substr( 1, 1 ) );
+			//query.WERKS = new RegExp( '^' + req.query.WERKS );
+		}
+
+		if ( req.query.COMP_CODE ) {
+			query.WERKS = new RegExp( '^' + req.query.COMP_CODE );
+		}
+
+		if ( req.query.WERKS ) {
+			/*
+			var length_werks = String( req.query.WERKS ).length;
+
+			if ( length_werks < 4 ) {
+				query.WERKS = new RegExp( '^' + req.query.WERKS );
+			}
+			else if ( length_werks == 4 ) {
+				query.WERKS = req.query.WERKS;
+			}
+			else if ( length_werks > 4 ) {
+				query.WERKS = req.query.WERKS.substr( 0, 4 );
+			}
+			*/
+			query.WERKS = req.query.WERKS;
+		}
+
+		if ( req.query.AFD_CODE ) {
+			query.AFD_CODE = req.query.AFD_CODE;
+		}
+
+		if ( req.query.BLOCK_CODE ) {
+			query.BLOCK_CODE = req.query.BLOCK_CODE;
+		}
+
+		console.log( query );
+		
+
+		/*
+		DELETE_USER: "",
+		WERKS: query_search,
+		//ASSIGN_TO: auth.USER_AUTH_CODE,
+		$and: [
+			{
+				$or: [
+					{
+						INSERT_TIME: {
+							$gte: start_date,
+							$lte: end_date
+						}
+					}
+				]
+			}
+		]
+		*/
+		console.log(query);
+
+
+		inspectionHModel.find(
+			query 
+		)
+		.select( {
+			_id: 0,
+			__v: 0
+		} )
+		.then( data => {
+			if( !data ) {
+				return res.send( {
+					status: false,
+					message: config.error_message.find_404,
+					data: {}
+				} );
+			}
+			
+			var results = [];
+			data.forEach( function( result ) {
+				results.push( {
+					BLOCK_INSPECTION_CODE: result.BLOCK_INSPECTION_CODE,
+					WERKS: result.WERKS,
+					AFD_CODE: result.AFD_CODE,
+					BLOCK_CODE: result.BLOCK_CODE,
+					AREAL: result.AREAL,
+					INSPECTION_TYPE: result.INSPECTION_TYPE,
+					INSPECTION_DATE: date.convert( String( result.INSPECTION_DATE ), 'YYYY-MM-DD hh-mm-ss' ),
+					INSPECTION_SCORE: result.INSPECTION_SCORE,
+					INSPECTION_RESULT: result.INSPECTION_RESULT,
+					STATUS_SYNC: result.STATUS_SYNC,
+					SYNC_TIME: date.convert( String( result.SYNC_TIME ) , 'YYYY-MM-DD hh-mm-ss' ),
+					START_INSPECTION: date.convert( String( result.START_INSPECTION ) , 'YYYY-MM-DD hh-mm-ss' ),
+					END_INSPECTION: date.convert(  String( result.END_INSPECTION ), 'YYYY-MM-DD hh-mm-ss' ),
+					LAT_START_INSPECTION: result.LAT_START_INSPECTION,
+					LONG_START_INSPECTION: result.LONG_START_INSPECTION,
+					LAT_END_INSPECTION: result.LAT_END_INSPECTION,
+					LONG_END_INSPECTION: result.LONG_END_INSPECTION,
+					
+					INSERT_USER: result.INSERT_USER,
+					INSERT_TIME: date.convert( String( result.INSERT_TIME ), 'YYYY-MM-DD hh-mm-ss' ),
+					UPDATE_USER: result.UPDATE_USER,
+					UPDATE_TIME: date.convert( String( result.UPDATE_TIME ), 'YYYY-MM-DD hh-mm-ss' ),
+					DELETE_USER: result.DELETE_USER,
+					DELETE_TIME: date.convert( String( result.DELETE_TIME ), 'YYYY-MM-DD hh-mm-ss' ),
+				} );
+			} );
+			
+			res.send( {
+				status: true,
+				message: config.error_message.find_200,
+				data: results
+			} );
+		} ).catch( err => {
+			res.send( {
+				status: false,
+				message: config.error_message.find_500,
+				data: {}
+			} );
+		} );
+
 	};

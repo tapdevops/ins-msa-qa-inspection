@@ -404,7 +404,7 @@ exports.findOneH = ( req, res ) => {
  * Untuk menampilkan seluruh data tanpa batasan REFFERENCE_ROLE dan LOCATION_CODE
  * --------------------------------------------------------------------------
  */
- 	exports.findReport = ( req, res ) => {
+ 	exports.findReport = async ( req, res ) => {
  		var url_query = req.query;
 		var url_query_length = Object.keys( url_query ).length;
 		var query = {};
@@ -444,9 +444,55 @@ exports.findOneH = ( req, res ) => {
 			query.BLOCK_CODE = req.query.BLOCK_CODE;
 		}
 
-		console.log( query );
+		//query.INSPECTION_DATE = {
+		//	$gte: req.query.START_DATE,
+		//	$lte: req.query.END_DATE,
+		//}
 
- 		viewInspectionModel.find( query)
+		var results = await viewInspectionModel.find( {
+	 		WERKS: req.query.WERKS,
+	 		AFD_CODE: req.query.AFD_CODE,
+	 		BLOCK_CODE: req.query.BLOCK_CODE,
+	 		INSPECTION_DATE: {
+	 			$gte: Number( req.query.START_DATE ),
+	 			$lte: Number( req.query.END_DATE )
+	 		}
+	 	} );
+
+		if ( results.length > 0 ) {
+			res.send( {
+				status: true,
+				message: config.error_message.find_200,
+				data: results
+			} );
+		}
+		else {
+			return res.send( {
+				status: false,
+				message: config.error_message.find_404,
+				data: {}
+			} );
+		}
+		/*
+ 		viewInspectionModel.find( 
+	 		{
+	 			WERKS: '4121',
+	 			AFD_CODE: 'A',
+	 			BLOCK_CODE: '002',
+	 			INSPECTION_DATE: {
+	 				$gte: Number( req.query.START_DATE ),
+	 				$lte: Number( req.query.END_DATE )
+	 			}
+	 		}
+ 			//query,
+ 			//{
+ 			//	$and: [
+ 			//		{
+ 			//			INSPECTION_DATE: '20190101123221'
+ 			//		}
+ 			//	]
+ 			//}
+ 		 )
 		.then( data => {
 			if( !data ) {
 				return res.send( {
@@ -467,6 +513,7 @@ exports.findOneH = ( req, res ) => {
 				data: {}
 			} );
 		} );
+		*/
  	}
 
 	exports.findReport2 = ( req, res ) => {
@@ -534,7 +581,14 @@ exports.findOneH = ( req, res ) => {
 
 
 		inspectionHModel.find(
-			query 
+			query
+		//{
+		//	WEKRS: ''
+		//	INSPECTION_DATE: {
+		//		$gte: req.query.START_DATE,
+		//		$lte: req.query.END_DATE
+		//	}
+		//}
 		)
 		.select( {
 			_id: 0,

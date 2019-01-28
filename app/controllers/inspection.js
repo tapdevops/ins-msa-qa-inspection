@@ -410,54 +410,68 @@ exports.findOneH = ( req, res ) => {
 		var query = {};
 			query.DELETE_USER = "";
 
-		if ( req.query.REGION_CODE ) {
-			query.WERKS = new RegExp( '^' + req.query.REGION_CODE.substr( 1, 1 ) );
-			//query.WERKS = new RegExp( '^' + req.query.WERKS );
+		// Find By Region Code
+		if ( req.query.REGION_CODE && !req.query.COMP_CODE ) {
+			console.log( 'Find By Region Code' );
+			var results = await viewInspectionModel.find( {
+				WERKS: new RegExp( '^' + req.query.REGION_CODE.substr( 1, 2 ) ),
+				INSPECTION_DATE: {
+					$gte: Number( req.query.START_DATE ),
+					$lte: Number( req.query.END_DATE )
+				}
+			} );
 		}
 
-		if ( req.query.COMP_CODE ) {
-			query.WERKS = new RegExp( '^' + req.query.COMP_CODE );
+		// Find By Comp Code
+		if ( req.query.COMP_CODE && !req.query.WERKS ) {
+			console.log( 'Find By Comp Code' );
+			var results = await viewInspectionModel.find( {
+				WERKS: new RegExp( '^' + req.query.COMP_CODE.substr( 0, 2 ) ),
+				INSPECTION_DATE: {
+					$gte: Number( req.query.START_DATE ),
+					$lte: Number( req.query.END_DATE )
+				}
+			} );
 		}
 
-		if ( req.query.WERKS ) {
-			/*
-			var length_werks = String( req.query.WERKS ).length;
-
-			if ( length_werks < 4 ) {
-				query.WERKS = new RegExp( '^' + req.query.WERKS );
-			}
-			else if ( length_werks == 4 ) {
-				query.WERKS = req.query.WERKS;
-			}
-			else if ( length_werks > 4 ) {
-				query.WERKS = req.query.WERKS.substr( 0, 4 );
-			}
-			*/
-			query.WERKS = req.query.WERKS;
+		// Find By BA Code / WERKS
+		if ( req.query.WERKS && !req.query.AFD_CODE ) {
+			console.log( 'Find By BA Code / WERKS' );
+			var results = await viewInspectionModel.find( {
+				WERKS: new RegExp( '^' + req.query.WERKS.substr( 0, 4 ) ),
+				INSPECTION_DATE: {
+					$gte: Number( req.query.START_DATE ),
+					$lte: Number( req.query.END_DATE )
+				}
+			} );
 		}
 
-		if ( req.query.AFD_CODE ) {
-			query.AFD_CODE = req.query.AFD_CODE;
+		// Find By AFD Code
+		if ( req.query.AFD_CODE && req.query.WERKS && !req.query.BLOCK_CODE ) {
+			console.log( 'Find By AFD Code' );
+			var results = await viewInspectionModel.find( {
+				WERKS: req.query.WERKS,
+				AFD_CODE: req.query.AFD_CODE,
+				INSPECTION_DATE: {
+					$gte: Number( req.query.START_DATE ),
+					$lte: Number( req.query.END_DATE )
+				}
+			} );
 		}
 
-		if ( req.query.BLOCK_CODE ) {
-			query.BLOCK_CODE = req.query.BLOCK_CODE;
+		// Find By Block Code
+		if ( req.query.BLOCK_CODE && req.query.AFD_CODE && req.query.WERKS ) {
+			console.log( 'Find By Block Code' );
+			var results = await viewInspectionModel.find( {
+				WERKS: req.query.WERKS,
+				AFD_CODE: req.query.AFD_CODE,
+				BLOCK_CODE: req.query.BLOCK_CODE,
+				INSPECTION_DATE: {
+					$gte: Number( req.query.START_DATE ),
+					$lte: Number( req.query.END_DATE )
+				}
+			} );
 		}
-
-		//query.INSPECTION_DATE = {
-		//	$gte: req.query.START_DATE,
-		//	$lte: req.query.END_DATE,
-		//}
-
-		var results = await viewInspectionModel.find( {
-	 		WERKS: req.query.WERKS,
-	 		AFD_CODE: req.query.AFD_CODE,
-	 		BLOCK_CODE: req.query.BLOCK_CODE,
-	 		INSPECTION_DATE: {
-	 			$gte: Number( req.query.START_DATE ),
-	 			$lte: Number( req.query.END_DATE )
-	 		}
-	 	} );
 
 		if ( results.length > 0 ) {
 			res.send( {
@@ -468,8 +482,8 @@ exports.findOneH = ( req, res ) => {
 		}
 		else {
 			return res.send( {
-				status: false,
-				message: config.error_message.find_404,
+				status: true,
+				message: config.error_message.find_200,
 				data: {}
 			} );
 		}

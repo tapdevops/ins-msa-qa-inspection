@@ -160,7 +160,7 @@
 			AREAL: req.body.AREAL,
 			INSPECTION_TYPE: date.convert( req.body.INSPECTION_TYPE, 'YYYYMMDDhhmmss' ),
 			INSPECTION_DATE: date.convert( req.body.INSPECTION_DATE, 'YYYYMMDDhhmmss' ),
-			INSPECTION_SCORE: req.body.INSPECTION_SCORE,
+			INSPECTION_SCORE: parseFloat( req.body.INSPECTION_SCORE ) || 0,
 			INSPECTION_RESULT: req.body.INSPECTION_RESULT,
 			STATUS_SYNC: req.body.STATUS_SYNC,
 			SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),

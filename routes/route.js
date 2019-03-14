@@ -24,13 +24,37 @@
 |--------------------------------------------------------------------------
 */
 	module.exports = ( app ) => {
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Inspection Header
+		 |--------------------------------------------------------------------------
+		 */
 		app.post( '/inspection-header', token_verify, InspectionHeaderController.create );
 		app.get( '/inspection-header/all', token_verify, InspectionHeaderController.findAll );
 		app.get( '/inspection-header/q', token_verify, InspectionHeaderController.findAll );
 		app.get( '/inspection-header/:id', token_verify, InspectionHeaderController.findOne );
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Inspection Detail
+		 |--------------------------------------------------------------------------
+		 */
 		app.post( '/inspection-detail', token_verify, InspectionDetailController.create );
 		app.get( '/inspection-detail/:id', token_verify, InspectionDetailController.findOne );
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Inspection Tracking
+		 |--------------------------------------------------------------------------
+		 */
 		app.post( '/inspection-tracking', token_verify, InspectionTrackingController.create );
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Inspection Report
+		 |--------------------------------------------------------------------------
+		 */
 		app.get( '/inspection-report/q', token_verify, InspectionReportController.find );
 		app.get( '/inspection-report/all', token_verify, InspectionReportController.find );
 	}

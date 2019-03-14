@@ -1,9 +1,45 @@
-const jwt = require( 'jsonwebtoken' );
-const config = require( '../config/config.js' );
-const uuid = require( 'uuid' );
-const nJwt = require( 'njwt' );
-const jwtDecode = require( 'jwt-decode' );
+/*
+|--------------------------------------------------------------------------
+| Variable
+|--------------------------------------------------------------------------
+*/
+	// Config
+	const config = require( _directory_base + '/config/config.js' );
 
+	// Node Modules
+	const jwt = require( 'jsonwebtoken' );
+	const uuid = require( 'uuid' );
+	const nJwt = require( 'njwt' );
+	const jwtDecode = require( 'jwt-decode' );
+
+	// Declare Controllers
+	const InspectionHeaderController = require( '../app/controllers/InspectionHeaderController.js' );
+	const InspectionDetailController = require( '../app/controllers/InspectionDetailController.js' );
+	const InspectionReportController = require( '../app/controllers/InspectionReportController.js' );
+	const InspectionTrackingController = require( '../app/controllers/InspectionTrackingController.js' );
+	
+/*
+|--------------------------------------------------------------------------
+| Routing
+|--------------------------------------------------------------------------
+*/
+	module.exports = ( app ) => {
+		app.post( '/inspection-header', token_verify, InspectionHeaderController.create );
+		app.get( '/inspection-header/all', token_verify, InspectionHeaderController.findAll );
+		app.get( '/inspection-header/q', token_verify, InspectionHeaderController.findAll );
+		app.get( '/inspection-header/:id', token_verify, InspectionHeaderController.findOne );
+		app.post( '/inspection-detail', token_verify, InspectionDetailController.create );
+		app.get( '/inspection-detail/:id', token_verify, InspectionDetailController.findOne );
+		app.post( '/inspection-tracking', token_verify, InspectionTrackingController.create );
+		app.get( '/inspection-report/q', token_verify, InspectionReportController.find );
+		app.get( '/inspection-report/all', token_verify, InspectionReportController.find );
+	}
+
+/*
+|--------------------------------------------------------------------------
+| Token Verify
+|--------------------------------------------------------------------------
+*/
 function token_verify( req, res, next ) {
 	// Get auth header value
 	const bearerHeader = req.headers['authorization'];
@@ -35,47 +71,4 @@ function token_verify( req, res, next ) {
 		// Forbidden
 		res.sendStatus( 403 );
 	}
-}
-
-function verifyToken( req, res, next ) {
-	// Get auth header value
-	const bearerHeader = req.headers['authorization'];
-
-	if ( typeof bearerHeader !== 'undefined' ) {
-		const bearer = bearerHeader.split( ' ' );
-		const bearerToken = bearer[1];
-
-		req.token = bearerToken;
-		next();
-	}
-	else {
-		// Forbidden
-		res.sendStatus( 403 );
-	}
-}
-
-module.exports = ( app ) => {
-
-	// Declare Controllers
-	const inspection = require( '../app/controllers/inspection.js' );
-
-	// Routing: Inspection
-	app.post( '/inspection-header', token_verify, inspection.createH );
-	app.get( '/inspection-header/all', token_verify, inspection.findHAll );
-	app.get( '/inspection-header/q', token_verify, inspection.findHAll );
-	app.get( '/inspection-header/:id', verifyToken, inspection.findOneH );
-	//app.put( '/inspection-header/:id', verifyToken, inspection.updateH );
-	//app.delete( '/inspection-header/:id', verifyToken, inspection.deleteH );
-	app.post( '/inspection-detail', token_verify, inspection.createD );
-	//app.get( '/inspection-detail', verifyToken, inspection.findD );
-	//app.get( '/inspection-detail/:id', verifyToken, inspection.findOneD );
-	//app.put( '/inspection-detail/:id', verifyToken, inspection.updateD );
-	//app.delete( '/inspection-detail/:id', verifyToken, inspection.deleteD );
-
-	app.post( '/inspection-tracking', token_verify, inspection.createTracking );
-
-
-	app.get( '/inspection-report/q', token_verify, inspection.findReport );
-	app.get( '/inspection-report/all', token_verify, inspection.findReport );
-
 }

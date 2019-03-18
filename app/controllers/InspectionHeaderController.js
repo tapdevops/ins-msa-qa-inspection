@@ -39,10 +39,37 @@
 					data: {}
 				} );
 			}
+
+			var rowdata = {
+				BLOCK_INSPECTION_CODE: data.BLOCK_INSPECTION_CODE,
+				WERKS: data.WERKS,
+				AFD_CODE: data.AFD_CODE,
+				BLOCK_CODE: data.BLOCK_CODE,
+				AREAL: data.AREAL,
+				INSPECTION_TYPE: data.INSPECTION_TYPE,
+				INSPECTION_DATE: date.convert( data.INSPECTION_DATE, 'YYYY-MM-DD hh:mm:ss' ),
+				INSPECTION_SCORE: data.INSPECTION_SCORE,
+				INSPECTION_RESULT: data.INSPECTION_RESULT,
+				STATUS_SYNC: data.STATUS_SYNC,
+				SYNC_TIME: date.convert( data.SYNC_TIME, 'YYYY-MM-DD hh:mm:ss' ),
+				START_INSPECTION: date.convert( data.START_INSPECTION, 'YYYY-MM-DD hh:mm:ss' ),
+				END_INSPECTION: date.convert( data.END_INSPECTION, 'YYYY-MM-DD hh:mm:ss' ),
+				LAT_START_INSPECTION: data.LAT_START_INSPECTION,
+				LONG_START_INSPECTION: data.LONG_START_INSPECTION,
+				LAT_END_INSPECTION: data.LAT_END_INSPECTION,
+				LONG_END_INSPECTION: data.LONG_END_INSPECTION,
+				INSERT_USER: data.INSERT_USER,
+				INSERT_TIME: date.convert( data.INSERT_TIME, 'YYYY-MM-DD hh:mm:ss' ),
+				UPDATE_USER: data.UPDATE_USER,
+				INSERT_TIME: date.convert( data.INSERT_TIME, 'YYYY-MM-DD hh:mm:ss' ),
+				DELETE_USER: data.DELETE_USER,
+				DELETE_TIME: date.convert( data.DELETE_TIME, 'YYYY-MM-DD hh:mm:ss' )
+			}
+
 			res.send( {
 				status: true,
 				message: config.error_message.find_200,
-				data: data
+				data: rowdata
 			} );
 		} ).catch( err => {
 			if( err.kind === 'ObjectId' ) {
@@ -74,7 +101,7 @@
 			AFD_CODE: req.body.AFD_CODE,
 			BLOCK_CODE: req.body.BLOCK_CODE,
 			AREAL: req.body.AREAL,
-			INSPECTION_TYPE: date.convert( req.body.INSPECTION_TYPE, 'YYYYMMDDhhmmss' ),
+			INSPECTION_TYPE: req.body.INSPECTION_TYPE,
 			INSPECTION_DATE: date.convert( req.body.INSPECTION_DATE, 'YYYYMMDDhhmmss' ),
 			INSPECTION_SCORE: parseFloat( req.body.INSPECTION_SCORE ) || 0,
 			INSPECTION_RESULT: req.body.INSPECTION_RESULT,

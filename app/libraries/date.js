@@ -1,7 +1,7 @@
 const moment = require( 'moment-timezone' );
 module.exports.convert = function ( value, format ) { 
 	var result = '';
-
+	value = value.toString();
 	value = value.replace( /-/g, "" );
 	value = value.replace( /:/g, "" );
 	value = value.replace( / /g, "" );
@@ -37,6 +37,14 @@ module.exports.convert = function ( value, format ) {
 			}
 		break;
 		case 'YYYY-MM-DD hh-mm-ss':
+			if ( value.length == 14 ) {
+				result = value.substr( 0, 4 ) + '-' + value.substr( 4, 2 ) + '-' + value.substr( 6, 2 ) + ' ' + value.substr( 8, 2 ) + ':' + value.substr( 10, 2 ) + ':' + value.substr( 12, 2 );
+			}
+			else {
+				result = '';
+			}
+		break;
+		case 'YYYY-MM-DD hh:mm:ss':
 			if ( value.length == 14 ) {
 				result = value.substr( 0, 4 ) + '-' + value.substr( 4, 2 ) + '-' + value.substr( 6, 2 ) + ' ' + value.substr( 8, 2 ) + ':' + value.substr( 10, 2 ) + ':' + value.substr( 12, 2 );
 			}

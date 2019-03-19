@@ -14,6 +14,9 @@
 	const config = require( _directory_base + '/config/config.js' );
 	const date = require( _directory_base + '/app/libraries/date.js' );
 
+	// Modules
+	const validator = require( 'ferds-validator');
+
 /**
  * Find One
  * Mengambil data dengan parameter ID
@@ -94,68 +97,106 @@
  */
 	exports.create = ( req, res ) => {
 		
-		var auth = req.auth;
-		const set_data = new InspectionHModel( {
-			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
-			WERKS: req.body.WERKS,
-			AFD_CODE: req.body.AFD_CODE,
-			BLOCK_CODE: req.body.BLOCK_CODE,
-			AREAL: req.body.AREAL,
-			INSPECTION_TYPE: req.body.INSPECTION_TYPE,
-			INSPECTION_DATE: date.convert( req.body.INSPECTION_DATE, 'YYYYMMDDhhmmss' ),
-			INSPECTION_SCORE: parseFloat( req.body.INSPECTION_SCORE ) || 0,
-			INSPECTION_RESULT: req.body.INSPECTION_RESULT,
-			STATUS_SYNC: req.body.STATUS_SYNC,
-			SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
-			START_INSPECTION: date.convert( req.body.START_INSPECTION, 'YYYYMMDDhhmmss' ),
-			END_INSPECTION: date.convert( req.body.END_INSPECTION, 'YYYYMMDDhhmmss' ),
-			LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
-			LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
-			LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
-			LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
-			//ASSIGN_TO: req.body.ASSIGN_TO,
-			INSERT_USER: req.body.INSERT_USER,
-			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
-			UPDATE_USER: req.body.INSERT_USER,
-			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
-			DELETE_USER: "",
-			DELETE_TIME: 0
-		} );
+		var rules = [
+			{ "name": "BLOCK_INSPECTION_CODE", "value": req.body.BLOCK_INSPECTION_CODE, "rules": "required|alpha_numeric" },
+			{ "name": "WERKS", "value": req.body.WERKS, "rules": "required|numeric" },
+			{ "name": "AFD_CODE", "value": req.body.AFD_CODE, "rules": "required|alpha_numeric" },
+			{ "name": "BLOCK_CODE", "value": req.body.BLOCK_CODE, "rules": "required|alpha_numeric" },
+			{ "name": "INSPECTION_TYPE", "value": req.body.INSPECTION_TYPE, "rules": "required|alpha" },
+			{ "name": "INSPECTION_DATE", "value": req.body.INSPECTION_DATE.toString(), "rules": "required|exact_length(14)|numeric" },
+			{ "name": "INSPECTION_RESULT", "value": req.body.INSPECTION_RESULT, "rules": "required|alpha" },
+			{ "name": "STATUS_SYNC", "value": req.body.STATUS_SYNC, "rules": "required|alpha" },
+			{ "name": "SYNC_TIME", "value": req.body.SYNC_TIME.toString(), "rules": "required|exact_length(14)|numeric" },
+			{ "name": "START_INSPECTION", "value": req.body.START_INSPECTION.toString(), "rules": "required|exact_length(14)|numeric" },
+			{ "name": "END_INSPECTION", "value": req.body.END_INSPECTION.toString(), "rules": "required|exact_length(14)|numeric" },
+			{ "name": "LAT_START_INSPECTION", "value": parseFloat( req.body.LAT_START_INSPECTION ), "rules": "required|latitude" },
+			{ "name": "LONG_START_INSPECTION", "value": parseFloat( req.body.LONG_START_INSPECTION ), "rules": "required|longitude" },
+			{ "name": "LAT_END_INSPECTION", "value": parseFloat( req.body.LAT_END_INSPECTION ), "rules": "required|latitude" },
+			{ "name": "LONG_END_INSPECTION", "value": parseFloat( req.body.LONG_END_INSPECTION ), "rules": "required|longitude" },
+			{ "name": "INSERT_USER", "value": req.body.INSERT_USER, "rules": "required|alpha_numeric" },
+			{ "name": "INSERT_TIME", "value": req.body.INSERT_TIME.toString(), "rules": "required|exact_length(14)|numeric" }
+		];
 
-		set_data.save()
-		.then( data => {
-			if ( !data ) {
-				return res.send( {
-					status: false,
-					message: config.error_message.create_404,
-					data: {}
-				} );
-			}
+		var run_validator = validator.run( rules );
+		console.log( run_validator.error_lists );
 
-			// Insert Block Inspection H Log
-			const set_log = new InspectionHLogModel( {
+		if ( run_validator.status == false ) {
+			res.json( {
+				status: false,
+				message: "Error! Periksa kembali inputan anda.",
+				data: []
+			} );
+		}
+		else {
+			var auth = req.auth;
+			const set_data = new InspectionHModel( {
 				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
-				PROSES: 'INSERT',
-				IMEI: auth.IMEI,
-				SYNC_TIME: new Date().getTime(),
+				WERKS: req.body.WERKS,
+				AFD_CODE: req.body.AFD_CODE,
+				BLOCK_CODE: req.body.BLOCK_CODE,
+				AREAL: req.body.AREAL,
+				INSPECTION_TYPE: req.body.INSPECTION_TYPE,
+				INSPECTION_DATE: date.convert( req.body.INSPECTION_DATE, 'YYYYMMDDhhmmss' ),
+				INSPECTION_SCORE: parseFloat( req.body.INSPECTION_SCORE ) || 0,
+				INSPECTION_RESULT: req.body.INSPECTION_RESULT,
+				STATUS_SYNC: req.body.STATUS_SYNC,
+				SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
+				START_INSPECTION: date.convert( req.body.START_INSPECTION, 'YYYYMMDDhhmmss' ),
+				END_INSPECTION: date.convert( req.body.END_INSPECTION, 'YYYYMMDDhhmmss' ),
+				LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
+				LONG_START_INSPECTION: req.body.LONG_START_INSPECTION,
+				LAT_END_INSPECTION: req.body.LAT_END_INSPECTION,
+				LONG_END_INSPECTION: req.body.LONG_END_INSPECTION,
+				//ASSIGN_TO: req.body.ASSIGN_TO,
 				INSERT_USER: req.body.INSERT_USER,
 				INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+				UPDATE_USER: "",
+				UPDATE_TIME: 0,
+				DELETE_USER: "",
+				DELETE_TIME: 0
 			} );
 
-			set_log.save()
-			.then( data_log => {
-				if ( !data_log ) {
+			set_data.save()
+			.then( data => {
+				if ( !data ) {
 					return res.send( {
 						status: false,
-						message: config.error_message.create_404 + ' - Log',
+						message: config.error_message.create_404,
 						data: {}
 					} );
 				}
-				res.send( {
-					status: true,
-					message: config.error_message.create_200,
-					data: {},
-					BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
+
+				// Insert Block Inspection H Log
+				const set_log = new InspectionHLogModel( {
+					BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+					PROSES: 'INSERT',
+					IMEI: auth.IMEI,
+					SYNC_TIME: new Date().getTime(),
+					INSERT_USER: req.body.INSERT_USER,
+					INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+				} );
+
+				set_log.save()
+				.then( data_log => {
+					if ( !data_log ) {
+						return res.send( {
+							status: false,
+							message: config.error_message.create_404 + ' - Log',
+							data: {}
+						} );
+					}
+					res.send( {
+						status: true,
+						message: config.error_message.create_200,
+						data: {},
+						BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE
+					} );
+				} ).catch( err => {
+					res.send( {
+						status: false,
+						message: config.error_message.create_500 + ' - 2',
+						data: {}
+					} );
 				} );
 			} ).catch( err => {
 				res.send( {
@@ -164,13 +205,7 @@
 					data: {}
 				} );
 			} );
-		} ).catch( err => {
-			res.send( {
-				status: false,
-				message: config.error_message.create_500 + ' - 2',
-				data: {}
-			} );
-		} );
+		}
 		
 	};
 

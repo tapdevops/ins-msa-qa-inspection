@@ -14,6 +14,9 @@
 	const config = require( _directory_base + '/config/config.js' );
 	const date = require( _directory_base + '/app/libraries/date.js' );
 
+	// Modules
+	const validator = require( 'ferds-validator');
+
 /**
  * Find One
  * Mengambil data dengan parameter ID
@@ -67,69 +70,92 @@
  */
 	exports.create = ( req, res ) => {
 
-		var auth = req.auth;
-		const set = new InspectionDModel( {
-			BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
-			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
-			CONTENT_INSPECTION_CODE: req.body.CONTENT_INSPECTION_CODE,
-			VALUE: req.body.VALUE,
-			STATUS_SYNC: req.body.STATUS_SYNC,
-			SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
-			INSERT_USER: req.body.INSERT_USER,
-			INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
-			UPDATE_USER: req.body.INSERT_USER,
-			UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
-			DELETE_USER: "",
-			DELETE_TIME: 0
-		} );
+		var rules = [
+			{ "name": "BLOCK_INSPECTION_CODE_D", "value": req.body.BLOCK_INSPECTION_CODE_D, "rules": "required|alpha_numeric" },
+			{ "name": "BLOCK_INSPECTION_CODE", "value": req.body.BLOCK_INSPECTION_CODE, "rules": "required|alpha_numeric" },
+			{ "name": "CONTENT_INSPECTION_CODE", "value": req.body.CONTENT_INSPECTION_CODE, "rules": "required|alpha_numeric" },
+			{ "name": "VALUE", "value": req.body.VALUE, "rules": "required|numeric" },
+			{ "name": "STATUS_SYNC", "value": req.body.STATUS_SYNC, "rules": "required|alpha" },
+			{ "name": "SYNC_TIME", "value": req.body.SYNC_TIME.toString(), "rules": "required|exact_length(14)|numeric" },
+			{ "name": "INSERT_USER", "value": req.body.INSERT_USER, "rules": "required|alpha_numeric" },
+			{ "name": "INSERT_TIME", "value": req.body.INSERT_TIME.toString(), "rules": "required|exact_length(14)|numeric" }
+		];
 
+		var run_validator = validator.run( rules );
+		console.log( run_validator.error_lists );
 
-		set.save()
-		.then( data => {
-			if ( !data ) {
-				return res.send( {
-					status: false,
-					message: config.error_message.create_404,
-					data: {}
-				} );
-			}
-
-			const set_log = new InspectionDLogModel( {
+		if ( run_validator.status == false ) {
+			res.json( {
+				status: false,
+				message: "Error! Periksa kembali inputan anda.",
+				data: []
+			} );
+		}
+		else {
+			var auth = req.auth;
+			const set = new InspectionDModel( {
 				BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
-				PROSES: 'INSERT',
-				IMEI: auth.IMEI,
+				BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+				CONTENT_INSPECTION_CODE: req.body.CONTENT_INSPECTION_CODE,
+				VALUE: req.body.VALUE,
+				STATUS_SYNC: req.body.STATUS_SYNC,
 				SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
 				INSERT_USER: req.body.INSERT_USER,
 				INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+				UPDATE_USER: req.body.INSERT_USER,
+				UPDATE_TIME: date.convert( 'now', 'YYYYMMDDhhmmss' ),
+				DELETE_USER: "",
+				DELETE_TIME: 0
 			} );
 
-			set_log.save()
-			.then( data_log => {
-				if ( !data_log ) {
+
+			set.save()
+			.then( data => {
+				if ( !data ) {
 					return res.send( {
 						status: false,
-						message: config.error_message.create_404 + ' - Log',
+						message: config.error_message.create_404,
 						data: {}
 					} );
 				}
-				res.send( {
-					status: true,
-					message: config.error_message.create_200,
-					data: {}
+
+				const set_log = new InspectionDLogModel( {
+					BLOCK_INSPECTION_CODE_D: req.body.BLOCK_INSPECTION_CODE_D,
+					PROSES: 'INSERT',
+					IMEI: auth.IMEI,
+					SYNC_TIME: date.convert( req.body.SYNC_TIME, 'YYYYMMDDhhmmss' ),
+					INSERT_USER: req.body.INSERT_USER,
+					INSERT_TIME: date.convert( req.body.INSERT_TIME, 'YYYYMMDDhhmmss' ),
+				} );
+
+				set_log.save()
+				.then( data_log => {
+					if ( !data_log ) {
+						return res.send( {
+							status: false,
+							message: config.error_message.create_404 + ' - Log',
+							data: {}
+						} );
+					}
+					res.send( {
+						status: true,
+						message: config.error_message.create_200,
+						data: {}
+					} );
+				} ).catch( err => {
+					res.send( {
+						status: false,
+						message: config.error_message.create_500 + ' - 2',
+						data: {}
+					} );
 				} );
 			} ).catch( err => {
-				res.send( {
+				res.status( 500 ).send( {
 					status: false,
 					message: config.error_message.create_500 + ' - 2',
 					data: {}
 				} );
 			} );
-		} ).catch( err => {
-			res.status( 500 ).send( {
-				status: false,
-				message: config.error_message.create_500 + ' - 2',
-				data: {}
-			} );
-		} );
+		}
 		
 	};

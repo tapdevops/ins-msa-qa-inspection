@@ -74,7 +74,7 @@
 			{ "name": "BLOCK_INSPECTION_CODE_D", "value": req.body.BLOCK_INSPECTION_CODE_D, "rules": "required|alpha_numeric" },
 			{ "name": "BLOCK_INSPECTION_CODE", "value": req.body.BLOCK_INSPECTION_CODE, "rules": "required|alpha_numeric" },
 			{ "name": "CONTENT_INSPECTION_CODE", "value": req.body.CONTENT_INSPECTION_CODE, "rules": "required|alpha_numeric" },
-			{ "name": "VALUE", "value": req.body.VALUE, "rules": "required|numeric" },
+			{ "name": "VALUE", "value": req.body.VALUE, "rules": "required" },
 			{ "name": "STATUS_SYNC", "value": req.body.STATUS_SYNC, "rules": "required|alpha" },
 			{ "name": "SYNC_TIME", "value": req.body.SYNC_TIME.toString(), "rules": "required|exact_length(14)|numeric" },
 			{ "name": "INSERT_USER", "value": req.body.INSERT_USER, "rules": "required|alpha_numeric" },

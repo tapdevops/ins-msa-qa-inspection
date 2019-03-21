@@ -42,7 +42,7 @@
 		}
 
 		// Find By Comp Code
-		if ( req.query.COMP_CODE && !req.query.BA_CODE ) {
+		if ( req.query.COMP_CODE && !req.query.WERKS ) {
 			console.log( 'Find By Comp Code' );
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.COMP_CODE.substr( 0, 2 ) ),
@@ -58,11 +58,11 @@
 			} );
 		}
 		
-		// Find By BA Code / BA_CODE
-		if ( req.query.BA_CODE && !req.query.AFD_CODE ) {
-			console.log( 'Find By BA Code / BA_CODE' );
+		// Find By BA Code / WERKS
+		if ( req.query.WERKS && !req.query.AFD_CODE ) {
+			console.log( 'Find By BA Code / WERKS' );
 			var results = await ViewInspectionModel.find( {
-				WERKS: new RegExp( '^' + req.query.BA_CODE.substr( 0, 4 ) ),
+				WERKS: new RegExp( '^' + req.query.WERKS.substr( 0, 4 ) ),
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
 					$lte: Number( req.query.END_DATE )
@@ -76,10 +76,10 @@
 		}
 		
 		// Find By AFD Code
-		if ( req.query.AFD_CODE && req.query.BA_CODE && !req.query.BLOCK_CODE ) {
+		if ( req.query.AFD_CODE && req.query.WERKS && !req.query.BLOCK_CODE ) {
 			console.log( 'Find By AFD Code' );
 			var results = await ViewInspectionModel.find( {
-				WERKS: req.query.BA_CODE,
+				WERKS: req.query.WERKS,
 				AFD_CODE: req.query.AFD_CODE,
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
@@ -94,10 +94,10 @@
 		}
 
 		// Find By Block Code
-		if ( req.query.BLOCK_CODE && req.query.AFD_CODE && req.query.BA_CODE ) {
+		if ( req.query.BLOCK_CODE && req.query.AFD_CODE && req.query.WERKS ) {
 			console.log( 'Find By Block Code' );
 			var results = await ViewInspectionModel.find( {
-				WERKS: req.query.BA_CODE,
+				WERKS: req.query.WERKS,
 				AFD_CODE: req.query.AFD_CODE,
 				BLOCK_CODE: req.query.BLOCK_CODE,
 				INSPECTION_DATE: {

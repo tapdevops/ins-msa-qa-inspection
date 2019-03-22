@@ -5,8 +5,8 @@ Instalasi :
 ```
 $ cd /go/to/your/project-folder
 $ git init
-$ git clone https://github.com/tapdevops/ins-ms-ebcc-validation.git
-$ cd /go/to/your/project-folder/ins-ms-ebcc-validation
+$ git clone https://github.com/tapdevops/ins-msa-inspection.git
+$ cd /go/to/your/project-folder/ins-msa-inspection
 $ npm install
 $ node app.js
 ```

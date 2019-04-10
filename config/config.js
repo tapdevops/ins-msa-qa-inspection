@@ -7,7 +7,7 @@ module.exports = {
 	*/
 	port: process.env.PORT || 3010,
 	name: 'Microservice Inspection',
-	env: 'development', // production, qa, development
+	env: 'production', // production, qa, development
 
 	/*
 	|--------------------------------------------------------------------------

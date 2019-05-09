@@ -1,0 +1,69 @@
+/*
+ |--------------------------------------------------------------------------
+ | App Setup
+ |--------------------------------------------------------------------------
+ |
+ | Untuk menghandle models, libraries, helper, node modules, dan lain-lain
+ |
+ */
+ 	// Models
+ 	const InspectionHModel = require( _directory_base + '/app/v1.0/Http/Models/InspectionHModel.js' );
+ 	const InspectionDModel = require( _directory_base + '/app/v1.0/Http/Models/InspectionDModel.js' );
+
+	// Libraries
+ 	const HelperLib = require( _directory_base + '/app/v1.0/Http/Libraries/HelperLib.js' );
+
+/*
+ |--------------------------------------------------------------------------
+ | Versi 1.0.0
+ |--------------------------------------------------------------------------
+ */
+ 	/** 
+ 	  * Premi
+	  * --------------------------------------------------------------------
+	*/
+ 	exports.premi = async ( req, res ) => {
+ 		var data = await InspectionHModel.aggregate( [
+ 			{
+				"$lookup": {
+					"from": "TR_BLOCK_INSPECTION_D",
+					"localField": "BLOCK_INSPECTION_CODE",
+					"foreignField": "BLOCK_INSPECTION_CODE",
+					"as": "DETAIL"
+				}
+			},
+			{
+				"$project": {
+					"BLOCK_INSPECTION_CODE": 1,
+					"WERKS": 1,
+					"AFD_CODE": 1,
+					"BLOCK_CODE": 1,
+					"AREAL": 1,
+					"INSPECTION_TYPE": 1,
+					"INSPECTION_DATE": 1,
+					"INSPECTION_SCORE": 1,
+					"INSPECTION_RESULT": 1,
+					"SYNC_TIME": 1,
+					"START_INSPECTION": 1,
+					"END_INSPECTION": 1,
+					"LAT_START_INSPECTION": 1,
+					"LONG_START_INSPECTION": 1,
+					"LAT_END_INSPECTION": 1,
+					"LONG_END_INSPECTION": 1,
+					"INSERT_USER": 1,
+					"INSERT_TIME": 1,
+					"_id": 0,
+					"DETAIL.BLOCK_INSPECTION_CODE_D" : 1,
+					"DETAIL.CONTENT_INSPECTION_CODE" : 1,
+					"DETAIL.VALUE" : 1
+				}
+			}
+ 		] );
+
+ 		res.json( {
+ 			status: true,
+ 			mesage: "Success!",
+ 			data: data
+ 		} );
+ 		
+ 	}

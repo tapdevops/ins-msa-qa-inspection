@@ -7,17 +7,20 @@
  |
  */
  	// Models
-	const ViewInspectionModel = require( _directory_base + '/app/models/ViewInspectionModel.js' );
+ 	const ViewInspectionModel = require( _directory_base + '/app/v1.0/Http/Models/ViewInspectionModel.js' );
 
-	// Libraries
-	const config = require( _directory_base + '/config/config.js' );
-	const date = require( _directory_base + '/app/libraries/date.js' );
-
-/**
- * findAll
- * Untuk menampilkan seluruh data tanpa batasan REFFERENCE_ROLE dan LOCATION_CODE
- * --------------------------------------------------------------------------
+/*
+ |--------------------------------------------------------------------------
+ | Versi 1.0
+ |--------------------------------------------------------------------------
  */
+ 	/** 
+ 	  * Find
+	  * Untuk mengambil seluruh data atau dengan parameter tertentu, contohnya :
+	  * URL.DOMAIN/v1.0/q?WERKS=4122
+	  * URL.DOMAIN/v1.0/q?WERKS=4122&BLOCK_CODE=001
+	  * --------------------------------------------------------------------
+	*/
  	exports.find = async ( req, res ) => {
  		var url_query = req.query;
 		var url_query_length = Object.keys( url_query ).length;
@@ -36,7 +39,7 @@
 			} );
 			res.send( {
 				status: true,
-				message: config.error_message.find_200,
+				message: config.app.error_message.find_200,
 				data: results
 			} );
 		}
@@ -53,7 +56,7 @@
 			} );
 			res.send( {
 				status: true,
-				message: config.error_message.find_200,
+				message: config.app.error_message.find_200,
 				data: results
 			} );
 		}
@@ -70,7 +73,7 @@
 			} );
 			res.send( {
 				status: true,
-				message: config.error_message.find_200,
+				message: config.app.error_message.find_200,
 				data: results
 			} );
 		}
@@ -88,7 +91,7 @@
 			} );
 			res.send( {
 				status: true,
-				message: config.error_message.find_200,
+				message: config.app.error_message.find_200,
 				data: results
 			} );
 		}
@@ -107,7 +110,7 @@
 			} );
 			res.send( {
 				status: true,
-				message: config.error_message.find_200,
+				message: config.app.error_message.find_200,
 				data: results
 			} );
 		}

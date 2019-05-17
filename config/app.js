@@ -10,9 +10,14 @@
 		| App Config
 		|--------------------------------------------------------------------------
 		*/
-			port: process.env.PORT || 3010,
+			//port: process.env.PORT || 3010,
 			name: 'Microservice Inspection',
-			env: 'development', // production, qa, development
+			env: 'development', // production, quality_assurance, development,
+			port: {
+				development: process.env.PORT || 4010,
+				quality_assurance: process.env.PORT || 5010,
+				production: process.env.PORT || 3010,
+			},
 
 		/*
 		|--------------------------------------------------------------------------

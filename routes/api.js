@@ -72,7 +72,7 @@
 		 |--------------------------------------------------------------------------
 		 */
 			// Export
-			app.get( '/export/premi/:id', Middleware.v_1_0.VerifyToken, RoutesVersioning( {
+			app.get( '/export/premi/:first_date/:end_date', Middleware.v_1_0.VerifyToken, RoutesVersioning( {
 				"1.0.0": Controllers.v_1_0.ExportController.premi
 			} ) );
 

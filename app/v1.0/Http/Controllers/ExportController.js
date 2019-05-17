@@ -23,6 +23,7 @@
 	  * --------------------------------------------------------------------
 	*/
  	exports.premi = async ( req, res ) => {
+ 		console.log(req.params)
  		var data = await InspectionHModel.aggregate( [
  			{
 				"$lookup": {
@@ -56,6 +57,14 @@
 					"DETAIL.BLOCK_INSPECTION_CODE_D" : 1,
 					"DETAIL.CONTENT_INSPECTION_CODE" : 1,
 					"DETAIL.VALUE" : 1
+				}
+			},
+			{
+				"$match": {
+					"INSPECTION_DATE": {
+						"$gte": parseInt( req.params.first_date ),
+						"$lte": parseInt( req.params.end_date )
+					}
 				}
 			}
  		] );

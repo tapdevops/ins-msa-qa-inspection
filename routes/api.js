@@ -14,6 +14,7 @@
 			InspectionHeaderController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionHeaderController.js' ),
 			InspectionTrackingController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionTrackingController.js' ),
 			InspectionReportController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionReportController.js' ),
+			SummaryController: require( _directory_base + '/app/v1.0/Http/Controllers/SummaryController.js' ),
 		}
 	}
 
@@ -40,8 +41,8 @@
 				res.json( { 
 					application: {
 						name : config.app.name,
-						port : config.app.port,
-						environment : config.app.env
+						env : config.app.env,
+						port : config.app.port[config.app.env]
 					} 
 				} )
 			} );
@@ -65,6 +66,10 @@
 			
 			// Inspection Report
 			app.get( '/api/v1.0/report', Middleware.v_1_0.VerifyToken, Controllers.v_1_0.InspectionReportController.find );
+
+			// Summary
+			app.get( '/api/v1.0/summary/total-inspeksi', Middleware.v_1_0.VerifyToken, Controllers.v_1_0.SummaryController.total_inspeksi );
+			app.get( '/api/v1.0/summary/total-jarak', Middleware.v_1_0.VerifyToken, Controllers.v_1_0.SummaryController.total_jarak );
 			
 		/*
 		 |--------------------------------------------------------------------------

@@ -45,7 +45,7 @@
 			},
 			{
 				"$match": {
-					"INSERT_USER": "TAC001011"
+					"INSERT_USER": req.auth.USER_AUTH_CODE
 				}
 			},
 			{
@@ -80,7 +80,7 @@
 			data: {
 				distance_meter: total_meter_distance,
 				distance_km: ( total_meter_distance / 1000 ),
-				duration: 243
+				duration: 0
 			}
 		} );
 	};
@@ -96,7 +96,7 @@
  		var inspection_test = await InspectionHModel.aggregate( [
 			{
 				"$match": {
-					"INSERT_USER": "TAC001011"
+					"INSERT_USER": req.auth.USER_AUTH_CODE
 				}
 			},
 			{

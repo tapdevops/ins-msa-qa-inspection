@@ -52,8 +52,10 @@
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
 					$lte: Number( req.query.END_DATE )
-				}
+				},
+				DELETE_TIME: 0
 			} );
+			
 			res.send( {
 				status: true,
 				message: config.app.error_message.find_200,
@@ -69,8 +71,10 @@
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
 					$lte: Number( req.query.END_DATE )
-				}
+				},
+				DELETE_TIME: 0
 			} );
+			
 			res.send( {
 				status: true,
 				message: config.app.error_message.find_200,
@@ -87,8 +91,10 @@
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
 					$lte: Number( req.query.END_DATE )
-				}
+				},
+				DELETE_TIME: 0
 			} );
+			
 			res.send( {
 				status: true,
 				message: config.app.error_message.find_200,
@@ -106,8 +112,10 @@
 				INSPECTION_DATE: {
 					$gte: Number( req.query.START_DATE ),
 					$lte: Number( req.query.END_DATE )
-				}
+				},
+				DELETE_TIME: 0
 			} );
+			
 			res.send( {
 				status: true,
 				message: config.app.error_message.find_200,

@@ -11,6 +11,7 @@
 		v_1_0: {
 			ExportController: require( _directory_base + '/app/v1.0/Http/Controllers/ExportController.js' ),
 			InspectionDetailController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionDetailController.js' ),
+			InspectionGenbaController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionGenbaController.js' ),
 			InspectionHeaderController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionHeaderController.js' ),
 			InspectionTrackingController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionTrackingController.js' ),
 			InspectionReportController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionReportController.js' ),
@@ -55,6 +56,9 @@
 		 	// Inspection Detail
 			app.get( '/api/v1.0/detail/:id', Middleware.v_1_0.VerifyToken, Controllers.v_1_0.InspectionDetailController.find_one );
 			app.post( '/api/v1.0/detail', Middleware.v_1_0.VerifyToken, Controllers.v_1_0.InspectionDetailController.create );
+			
+			// Inspection Header
+		 	app.post( '/api/v1.0/genba',  Middleware.v_1_0.VerifyToken, Controllers.v_1_0.InspectionGenbaController.create );
 			
 			// Inspection Header
 			app.get( '/api/v1.0/find',  Middleware.v_1_0.VerifyToken, Controllers.v_1_0.InspectionHeaderController.find );

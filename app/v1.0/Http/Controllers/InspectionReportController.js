@@ -32,10 +32,17 @@
 			console.log( 'Find By Region Code' );
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.REGION_CODE.substr( 1, 2 ) ),
+				BLOCK_INSPECTION_CODE: {
+					"$in": [
+						"I0126190427130038",
+						"I0126190427125333"
+					]
+				},
 				INSPECTION_DATE: {
-					$gte: Number( req.query.START_DATE ),
-					$lte: Number( req.query.END_DATE )
-				}
+					$gte: parseInt( req.query.START_DATE ),
+					$lte: parseInt( req.query.END_DATE )
+				},
+				DELETE_USER: ""
 			} );
 			res.send( {
 				status: true,
@@ -49,11 +56,16 @@
 			console.log( 'Find By Comp Code' );
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.COMP_CODE.substr( 0, 2 ) ),
-				INSPECTION_DATE: {
-					$gte: Number( req.query.START_DATE ),
-					$lte: Number( req.query.END_DATE )
+				BLOCK_INSPECTION_CODE: {
+					"$in": [
+						"I0126190427130038", "I0126190427125333"
+					]
 				},
-				DELETE_TIME: 0
+				INSPECTION_DATE: {
+					$gte: parseInt( req.query.START_DATE ),
+					$lte: parseInt( req.query.END_DATE )
+				},
+				DELETE_USER: ""
 			} );
 			
 			res.send( {
@@ -69,10 +81,10 @@
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.WERKS.substr( 0, 4 ) ),
 				INSPECTION_DATE: {
-					$gte: Number( req.query.START_DATE ),
-					$lte: Number( req.query.END_DATE )
+					$gte: parseInt( req.query.START_DATE ),
+					$lte: parseInt( req.query.END_DATE )
 				},
-				DELETE_TIME: 0
+				DELETE_USER: ""
 			} );
 			
 			res.send( {
@@ -89,10 +101,10 @@
 				WERKS: req.query.WERKS,
 				AFD_CODE: req.query.AFD_CODE,
 				INSPECTION_DATE: {
-					$gte: Number( req.query.START_DATE ),
-					$lte: Number( req.query.END_DATE )
+					$gte: parseInt( req.query.START_DATE ),
+					$lte: parseInt( req.query.END_DATE )
 				},
-				DELETE_TIME: 0
+				DELETE_USER: ""
 			} );
 			
 			res.send( {
@@ -110,10 +122,10 @@
 				AFD_CODE: req.query.AFD_CODE,
 				BLOCK_CODE: req.query.BLOCK_CODE,
 				INSPECTION_DATE: {
-					$gte: Number( req.query.START_DATE ),
-					$lte: Number( req.query.END_DATE )
+					$gte: parseInt( req.query.START_DATE ),
+					$lte: parseInt( req.query.END_DATE )
 				},
-				DELETE_TIME: 0
+				DELETE_USER: ""
 			} );
 			
 			res.send( {

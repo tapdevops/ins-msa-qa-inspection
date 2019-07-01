@@ -59,6 +59,7 @@
 				}
 			}
 		] );
+		// console.log(query);
 		var total_meter_distance = 0;
 		var total_km_distance = 0;
 
@@ -69,12 +70,13 @@
 					var track_1 = query[i];
 					var track_2 = query[j];
 					var compute_distance = exports.compute_distance( track_1.LAT_TRACK, track_1.LONG_TRACK, track_2.LAT_TRACK, track_2.LONG_TRACK );
+					console.log(compute_distance);
 					total_meter_distance += compute_distance;
 				}
 			}
 		}
 		
-		res.status( 200 ).json( {
+		return res.status( 200 ).json( {
 			status: true,
 			message: "Success!",
 			data: {
@@ -125,7 +127,7 @@
 			} );
 		}
 
- 		res.status( 200 ).json( {
+ 		return res.status( 200 ).json( {
  			status: true,
  			message: "Success!",
  			data: results

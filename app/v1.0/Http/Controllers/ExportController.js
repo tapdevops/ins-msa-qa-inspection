@@ -71,10 +71,53 @@
 			}
  		] );
 
- 		res.json( {
+ 		return res.json( {
  			status: true,
  			mesage: "Success!",
  			data: data
  		} );
  		
  	}
+
+ 	exports.tap_dw_tr_inspection = async ( req, res ) => {
+ 		var data = await InspectionHModel.aggregate( [
+			{
+				"$lookup": {
+					"from": "TR_BLOCK_INSPECTION_D",
+					"localField": "BLOCK_INSPECTION_CODE",
+					"foreignField": "BLOCK_INSPECTION_CODE",
+					"as": "DETAIL"
+				}
+			},
+			{
+				"$project": {
+				"WERKS": 1,
+				"AFD_CODE": 1,
+				"BLOCK_CODE": 1,
+				"WERKS_AFD_BLOCK_CODE": {
+					"$concat": [ "$WERKS", "$AFD_CODE", "$BLOCK_CODE" ]
+				},
+				"INSPECTION_TYPE": 1,
+				"INSPECTION_DATE": 1,
+				"INSPECTION_SCORE": 1, 
+				"INSPECTION_RESULT": 1,
+				"INSERT_TIME": 1,
+				"INSERT_USER": 1,
+				"AREAL": 1,
+				"LAT_START_INSPECTION": 1,
+				"LONG_START_INSPECTION": 1,
+				"LAT_END_INSPECTION": 1,
+				"LONG_END_INSPECTION": 1,
+				"DETAIL.BLOCK_INSPECTION_CODE_D": 1,
+				"DETAIL.CONTENT_INSPECTION_CODE": 1,
+				"DETAIL.VALUE": 1
+				}
+			}
+		] ).limit( 10 );
+		
+ 		return res.json( {
+ 			status: true,
+ 			message: "Success!",
+ 			data: data
+ 		} );
+ 	};

@@ -26,18 +26,15 @@
 		var url_query_length = Object.keys( url_query ).length;
 		var query = {};
 			query.DELETE_USER = "";
+
+
+		console.log( query );
 		
 		// Find By Region Code
 		if ( req.query.REGION_CODE && !req.query.COMP_CODE ) {
 			console.log( 'Find By Region Code' );
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.REGION_CODE.substr( 1, 2 ) ),
-				BLOCK_INSPECTION_CODE: {
-					"$in": [
-						"I0126190427130038",
-						"I0126190427125333"
-					]
-				},
 				INSPECTION_DATE: {
 					$gte: parseInt( req.query.START_DATE ),
 					$lte: parseInt( req.query.END_DATE )
@@ -56,11 +53,6 @@
 			console.log( 'Find By Comp Code' );
 			var results = await ViewInspectionModel.find( {
 				WERKS: new RegExp( '^' + req.query.COMP_CODE.substr( 0, 2 ) ),
-				BLOCK_INSPECTION_CODE: {
-					"$in": [
-						"I0126190427130038", "I0126190427125333"
-					]
-				},
 				INSPECTION_DATE: {
 					$gte: parseInt( req.query.START_DATE ),
 					$lte: parseInt( req.query.END_DATE )

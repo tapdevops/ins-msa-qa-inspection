@@ -14,7 +14,7 @@
     "ferds-validator": "^1.0.4",
     "jsonwebtoken": "^8.4.0",
     "jwt-decode": "^2.2.0",
-    "moment": "^2.23.0",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.23",
     "mongoose": "^5.3.4",
     "mongoose-double": "0.0.1",
